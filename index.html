@@ -1901,25 +1901,37 @@
     // ── Auth State ────────────────────────────────────────────────
     let currentUser = null;
     let isSignUp = false;
+    let authInitialized = false;
 
-    // Check for existing session on load
+    // Primary auth handler — handles initial session + all state changes
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        currentUser = session.user;
+        if (!authInitialized || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+          if (currentScreen === 'login') {
+            showScreen('dashboard', !authInitialized);
+          }
+          loadDashboard();
+        }
+      } else if (event === 'SIGNED_OUT') {
+        currentUser = null;
+        if (currentScreen !== 'login') {
+          showScreen('login', true);
+        }
+      }
+      authInitialized = true;
+    });
+
+    // Fallback: also check getSession in case onAuthStateChange doesn't fire
     async function initAuth() {
       const { data: { session } } = await supabaseClient.auth.getSession();
-      if (session) {
+      if (session && !authInitialized) {
         currentUser = session.user;
         showScreen('dashboard', false);
         loadDashboard();
+        authInitialized = true;
       }
     }
-
-    // Listen for auth state changes
-    supabaseClient.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        currentUser = session.user;
-      } else if (event === 'SIGNED_OUT') {
-        currentUser = null;
-      }
-    });
 
     // ── Login Screen ──────────────────────────────────────────────
     document.getElementById('login-toggle').addEventListener('click', () => {
@@ -1990,22 +2002,23 @@
       if (!currentUser) return;
 
       // Fetch or create program state
-      let { data: state } = await supabaseClient
+      let { data: stateRows } = await supabaseClient
         .from('user_program_state')
         .select('*')
-        .eq('user_id', currentUser.id)
-        .single();
+        .eq('user_id', currentUser.id);
+
+      let state = stateRows && stateRows.length > 0 ? stateRows[0] : null;
 
       if (!state) {
-        // First time — prompt to set start date via settings
-        // For now, auto-create with today as start
+        // First time — create with today as start
         const today = new Date().toISOString().split('T')[0];
-        const { data: newState } = await supabaseClient
+        const { data: newRows, error: insertErr } = await supabaseClient
           .from('user_program_state')
           .insert({ user_id: currentUser.id, current_program_day: 1, start_date: today })
-          .select()
-          .single();
-        state = newState;
+          .select();
+        if (insertErr) { console.error('Failed to create program state:', insertErr); return; }
+        state = newRows && newRows.length > 0 ? newRows[0] : null;
+        if (!state) { console.error('No state after insert'); return; }
       }
 
       programState = state;
