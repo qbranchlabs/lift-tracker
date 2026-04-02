@@ -2659,18 +2659,27 @@
 
     // Reset progress
     document.getElementById('btn-reset-progress').addEventListener('click', async () => {
-      if (!confirm('Reset all progress? This will delete all your workout data.')) return;
       if (!currentUser) return;
+      if (!confirm('Reset all progress? This will delete all your workout data.')) return;
 
-      await supabaseClient.from('exercise_logs').delete().eq('user_id', currentUser.id);
-      await supabaseClient.from('workout_sessions').delete().eq('user_id', currentUser.id);
-      await supabaseClient
+      // Delete logs first (FK dependency on sessions)
+      const r1 = await supabaseClient.from('exercise_logs').delete().eq('user_id', currentUser.id);
+      const r2 = await supabaseClient.from('workout_sessions').delete().eq('user_id', currentUser.id);
+      const r3 = await supabaseClient
         .from('user_program_state')
         .update({ current_program_day: 1, updated_at: new Date().toISOString() })
         .eq('user_id', currentUser.id);
+
+      if (r1.error || r2.error || r3.error) {
+        console.error('Reset errors:', r1.error, r2.error, r3.error);
+        alert('Reset failed. Check console for details.');
+        return;
+      }
+
       programState.current_program_day = 1;
       loadSettings();
       loadDashboard();
+      alert('Progress reset successfully.');
     });
 
     // Sign out
