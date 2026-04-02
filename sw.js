@@ -1,9 +1,9 @@
 const CACHE_NAME = 'lift-tracker-v2';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/program-data.js',
-  '/manifest.json',
+  './',
+  './index.html',
+  './program-data.js',
+  './manifest.json',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
 ];
 
