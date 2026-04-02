@@ -1498,43 +1498,31 @@
     <div class="screen-body">
       <!-- Phase Title -->
       <div class="phase-title">
-        <div class="phase-week" id="dash-phase-week">Week 3, Day 7</div>
-        <div class="phase-label" id="dash-phase-label">Phase 2 &mdash; Progressive Overload</div>
+        <div class="phase-week" id="dash-phase-week">Loading...</div>
+        <div class="phase-label" id="dash-phase-label">&nbsp;</div>
         <div class="phase-divider"></div>
       </div>
 
       <!-- Last Session (recessed) -->
-      <div class="last-session" id="dash-last-session">
+      <div class="last-session" id="dash-last-session" style="display:none;">
         <div class="last-session-header">
-          <span id="dash-last-title">Last Push 1</span>
-          <span class="last-session-date" id="dash-last-date">Mar 28</span>
-        </div>
-        <div class="last-session-row">
-          <span class="exercise-name">Chest Press</span>
-          <span class="exercise-result">185 &times; 8</span>
-        </div>
-        <div class="last-session-row">
-          <span class="exercise-name">DB Shoulder Press</span>
-          <span class="exercise-result">55 &times; 13</span>
-        </div>
-        <div class="last-session-row">
-          <span class="exercise-name">SM CG Bench</span>
-          <span class="exercise-result">135 &times; 7</span>
+          <span id="dash-last-title"></span>
+          <span class="last-session-date" id="dash-last-date"></span>
         </div>
       </div>
 
       <!-- Gauges (raised) -->
       <div class="gauges">
         <div class="gauge">
-          <div class="gauge-value" id="dash-gauge-done">12</div>
+          <div class="gauge-value" id="dash-gauge-done">--</div>
           <div class="gauge-label">Done</div>
         </div>
         <div class="gauge">
-          <div class="gauge-value" id="dash-gauge-week">04</div>
+          <div class="gauge-value" id="dash-gauge-week">--</div>
           <div class="gauge-label">Week</div>
         </div>
         <div class="gauge">
-          <div class="gauge-value" id="dash-gauge-left">42</div>
+          <div class="gauge-value" id="dash-gauge-left">--</div>
           <div class="gauge-label">Left</div>
         </div>
       </div>
@@ -1542,18 +1530,18 @@
       <!-- Today's Workout (calendar event card) -->
       <div class="workout-event" id="dash-workout-event">
         <div class="event-date-tab">
-          <span class="event-date-day" id="dash-event-day">Tuesday</span>
-          <span class="event-date-full" id="dash-event-date">April 1, 2026</span>
+          <span class="event-date-day" id="dash-event-day"></span>
+          <span class="event-date-full" id="dash-event-date"></span>
         </div>
 
         <div class="event-body">
           <div class="event-workout-label">Today's Workout</div>
-          <div class="event-workout-name" id="dash-workout-name">Push 1</div>
-          <div class="event-workout-focus" id="dash-workout-focus">Chest Focus</div>
+          <div class="event-workout-name" id="dash-workout-name"></div>
+          <div class="event-workout-focus" id="dash-workout-focus"></div>
 
           <div class="event-details">
             <div class="event-detail-item">
-              <span class="event-detail-value" id="dash-exercises-count">9</span>
+              <span class="event-detail-value" id="dash-exercises-count">—</span>
               <span class="event-detail-label">Exercises</span>
             </div>
             <div class="event-detail-item">
@@ -1758,7 +1746,7 @@
           <div class="settings-row" id="row-start-date" style="cursor:pointer;position:relative;">
             <span class="settings-row-label">Start Date</span>
             <div style="display:flex;align-items:center;">
-              <span class="settings-row-value" id="settings-start-date">Mar 10, 2026</span>
+              <span class="settings-row-value" id="settings-start-date">—</span>
               <span class="settings-row-chevron">&rsaquo;</span>
             </div>
             <input type="date" id="settings-date-input" style="position:absolute;opacity:0;width:100%;height:100%;top:0;left:0;cursor:pointer;">
@@ -1772,11 +1760,11 @@
           </div>
           <div class="settings-row">
             <span class="settings-row-label">Current Phase</span>
-            <span class="settings-row-value" id="settings-phase">Phase 2</span>
+            <span class="settings-row-value" id="settings-phase">—</span>
           </div>
           <div class="settings-row">
             <span class="settings-row-label">Workouts Completed</span>
-            <span class="settings-row-value" id="settings-completed">12 / 54</span>
+            <span class="settings-row-value" id="settings-completed">— / 54</span>
           </div>
         </div>
       </div>
