@@ -3611,20 +3611,33 @@
       return canon;
     }
 
+    /** Coerce DB/program values so 1 and "1" match (fixes completed styling/state). */
+    function normProgramDay(x) {
+      if (x == null || x === '') return null;
+      const n = Number(x);
+      return Number.isInteger(n) && n >= 1 && n <= 91 ? n : null;
+    }
+
     function scheduleEntryForProgramDay(pd) {
-      return PROGRAM.schedule.find(d => d.programDay === pd);
+      const n = normProgramDay(pd);
+      return n == null ? undefined : PROGRAM.schedule.find(d => d.programDay === n);
+    }
+
+    /** Plan day of the template used for a substitute session; null if canonical or missing column. */
+    function sessionSubstituteTemplateDay(s) {
+      return s ? normProgramDay(s.substitute_source_program_day) : null;
     }
 
     /** Completed session that counts as “did the planned training for program_day” (not a substitute-for-today session). */
     function sessionIsCanonicalTrainingComplete(s) {
       if (!s || !s.completed_at) return false;
       if (s.workout_type === 'rest') return false;
-      if (s.substitute_source_program_day != null) return false;
-      return true;
+      return sessionSubstituteTemplateDay(s) == null;
     }
 
     function sessionIsRestComplete(s, pd) {
-      return !!(s && s.completed_at && s.program_day === pd && s.workout_type === 'rest');
+      const pdn = normProgramDay(pd);
+      return !!(s && s.completed_at && normProgramDay(s.program_day) === pdn && s.workout_type === 'rest');
     }
 
     /**
@@ -3632,24 +3645,27 @@
      * completed early as someone else’s substitute template).
      */
     function isProgramDaySlotSatisfied(pd, sessions) {
-      const entry = scheduleEntryForProgramDay(pd);
+      const pdn = normProgramDay(pd);
+      if (pdn == null) return false;
+      const entry = scheduleEntryForProgramDay(pdn);
       if (!entry) return false;
       const list = sessions || [];
       if (entry.type === 'rest') {
-        return list.some(s => sessionIsRestComplete(s, pd));
+        return list.some(s => sessionIsRestComplete(s, pdn));
       }
-      if (list.some(s => s.program_day === pd && sessionIsCanonicalTrainingComplete(s))) return true;
-      return list.some(s => s.completed_at && s.substitute_source_program_day === pd);
+      if (list.some(s => normProgramDay(s.program_day) === pdn && sessionIsCanonicalTrainingComplete(s))) return true;
+      return list.some(s => s.completed_at && sessionSubstituteTemplateDay(s) === pdn);
     }
 
     function scheduleRowCompletedSession(entry, sessions) {
+      const ed = normProgramDay(entry.programDay);
       if (entry.type === 'rest') {
-        return (sessions || []).find(s => sessionIsRestComplete(s, entry.programDay)) || null;
+        return (sessions || []).find(s => sessionIsRestComplete(s, ed)) || null;
       }
       const list = (sessions || []).filter(s => s.completed_at);
-      const canon = list.find(s => s.program_day === entry.programDay && sessionIsCanonicalTrainingComplete(s));
+      const canon = list.find(s => normProgramDay(s.program_day) === ed && sessionIsCanonicalTrainingComplete(s));
       if (canon) return canon;
-      const sub = list.filter(s => s.substitute_source_program_day === entry.programDay);
+      const sub = list.filter(s => sessionSubstituteTemplateDay(s) === ed);
       if (!sub.length) return null;
       sub.sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at));
       return sub[0];
@@ -3673,11 +3689,12 @@
      */
     async function maybeAdvanceProgramDayAfterPstRoll() {
       if (!programState || !currentUser) return;
-      const { data: sessions } = await supabaseClient
+      const { data: sessions, error: advErr } = await supabaseClient
         .from('workout_sessions')
         .select('program_day, substitute_source_program_day, workout_type, completed_at')
         .eq('user_id', currentUser.id)
         .not('completed_at', 'is', null);
+      if (advErr) console.error('maybeAdvanceProgramDayAfterPstRoll', advErr);
 
       for (let i = 0; i < 96; i++) {
         const pd = programState.current_program_day;
@@ -3721,16 +3738,20 @@
       todayEntry = getTodayWorkoutScheduleEntry();
       if (!todayEntry) todayEntry = PROGRAM.schedule[PROGRAM.schedule.length - 1];
 
-      const { data: dashCompletedSession } = await supabaseClient
+      const { data: dashCand, error: dashSessErr } = await supabaseClient
         .from('workout_sessions')
-        .select('id, workout_type, completed_at')
+        .select('id, workout_type, completed_at, substitute_source_program_day')
         .eq('user_id', currentUser.id)
         .eq('program_day', programState.current_program_day)
-        .is('substitute_source_program_day', null)
-        .not('completed_at', 'is', null)
-        .limit(1)
-        .maybeSingle();
+        .not('completed_at', 'is', null);
+      if (dashSessErr) console.error('loadDashboard sessions for today', dashSessErr);
 
+      let dashCompletedSession = null;
+      if (todayEntry.type === 'rest') {
+        dashCompletedSession = (dashCand || []).find(s => s.workout_type === 'rest') || null;
+      } else {
+        dashCompletedSession = (dashCand || []).find(s => sessionIsCanonicalTrainingComplete(s)) || null;
+      }
       const dashDayComplete = !!dashCompletedSession;
       let dashOpenSessionId = null;
       if (!dashDayComplete && todayEntry.type !== 'rest') {
@@ -3858,21 +3879,24 @@
     }
 
     async function getCompletedCount() {
-      const { data: sessions } = await supabaseClient
+      const { data: sessions, error } = await supabaseClient
         .from('workout_sessions')
         .select('program_day, substitute_source_program_day, workout_type')
         .eq('user_id', currentUser.id)
         .not('completed_at', 'is', null);
+      if (error) console.error('getCompletedCount', error);
 
       const done = new Set();
       for (const s of sessions || []) {
         if (s.workout_type === 'rest') continue;
-        if (s.substitute_source_program_day != null) {
-          const e = scheduleEntryForProgramDay(s.substitute_source_program_day);
-          if (e && e.type === 'training') done.add(s.substitute_source_program_day);
+        const subD = sessionSubstituteTemplateDay(s);
+        if (subD != null) {
+          const e = scheduleEntryForProgramDay(subD);
+          if (e && e.type === 'training') done.add(subD);
         } else {
-          const e = scheduleEntryForProgramDay(s.program_day);
-          if (e && e.type === 'training') done.add(s.program_day);
+          const pd = normProgramDay(s.program_day);
+          const e = scheduleEntryForProgramDay(pd);
+          if (e && e.type === 'training' && pd != null) done.add(pd);
         }
       }
       return done.size;
@@ -4016,15 +4040,13 @@
         showToast('This is already today’s scheduled workout.', 'info');
         return;
       }
-      const { data: doneCanon } = await supabaseClient
+      const { data: doneCand } = await supabaseClient
         .from('workout_sessions')
-        .select('id')
+        .select('id, substitute_source_program_day, workout_type, completed_at')
         .eq('user_id', currentUser.id)
         .eq('program_day', programState.current_program_day)
-        .is('substitute_source_program_day', null)
-        .not('completed_at', 'is', null)
-        .limit(1)
-        .maybeSingle();
+        .not('completed_at', 'is', null);
+      const doneCanon = (doneCand || []).some(s => sessionIsCanonicalTrainingComplete(s));
       if (doneCanon) {
         showToast('Today is already complete. Substitution unlocks tomorrow.', 'info');
         return;
@@ -4141,15 +4163,13 @@
         const tmpl = todayEntry;
         if (tmpl.type !== 'training') return;
 
-        const { data: doneAlready } = await supabaseClient
+        const { data: doneCand } = await supabaseClient
           .from('workout_sessions')
-          .select('id')
+          .select('id, substitute_source_program_day, workout_type, completed_at')
           .eq('user_id', currentUser.id)
           .eq('program_day', programState.current_program_day)
-          .is('substitute_source_program_day', null)
-          .not('completed_at', 'is', null)
-          .limit(1)
-          .maybeSingle();
+          .not('completed_at', 'is', null);
+        const doneAlready = (doneCand || []).some(s => sessionIsCanonicalTrainingComplete(s));
         if (doneAlready) {
           showToast('This workout is already completed. The next session unlocks after midnight Pacific.', 'info');
           return;
@@ -4719,10 +4739,7 @@
           .select('substitute_source_program_day')
           .eq('id', currentSessionId)
           .maybeSingle();
-        const subSrc =
-          completingMeta && completingMeta.substitute_source_program_day != null
-            ? completingMeta.substitute_source_program_day
-            : null;
+        const subSrc = completingMeta ? sessionSubstituteTemplateDay(completingMeta) : null;
 
         const { error: updErr } = await supabaseClient
           .from('workout_sessions')
@@ -4913,9 +4930,7 @@
       showScreen('sessionReview', false);
       listEl.innerHTML = '<div class="session-review-heading">Loading…</div>';
       const templateDay =
-        session.substitute_source_program_day != null
-          ? session.substitute_source_program_day
-          : session.program_day;
+        sessionSubstituteTemplateDay(session) ?? normProgramDay(session.program_day);
       const sched = PROGRAM.schedule.find(d => d.programDay === templateDay);
       const title = sched && sched.type !== 'rest' ? sched.workoutName : 'Workout';
       document.getElementById('session-review-title').textContent = title;
@@ -4965,11 +4980,12 @@
       await maybeAdvanceProgramDayAfterPstRoll();
 
       // Fetch all completed sessions
-      const { data: sessions } = await supabaseClient
+      const { data: sessions, error: schedSessErr } = await supabaseClient
         .from('workout_sessions')
         .select('id, program_day, completed_at, workout_type, week, day, substitute_source_program_day')
         .eq('user_id', currentUser.id)
         .not('completed_at', 'is', null);
+      if (schedSessErr) console.error('loadSchedule workout_sessions', schedSessErr);
 
       const completedCount = await getCompletedCount();
       document.getElementById('schedule-subtitle').textContent = `${completedCount} of 54 workouts completed`;
