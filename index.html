@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#252525">
@@ -17,6 +17,8 @@
 
   html, body {
     height: 100%;
+    min-height: 100dvh;
+    min-height: 100vh;
     overflow: hidden;
   }
 
@@ -45,6 +47,8 @@
     display: none;
     flex-direction: column;
     height: 100%;
+    min-height: 100dvh;
+    min-height: 100vh;
     position: absolute;
     inset: 0;
     z-index: 1;
@@ -119,7 +123,7 @@
   /* ========================================= */
   .top-bar {
     background: linear-gradient(180deg, #353535 0%, #2a2a2a 40%, #252525 100%);
-    padding: 16px 22px 12px;
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 22px 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -138,7 +142,7 @@
   }
 
   .brand {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 300;
     letter-spacing: 6px;
     color: #aaa;
@@ -147,7 +151,7 @@
   }
 
   .model-number {
-    font-size: 9px;
+    font-size: 13px;
     color: #666;
     letter-spacing: 2px;
     font-weight: 300;
@@ -155,21 +159,39 @@
 
   /* Logging top bar variant */
   .top-bar-logging {
-    padding: 14px 22px;
+    padding: calc(14px + env(safe-area-inset-top, 0px)) 22px 14px;
   }
 
   .top-bar-back {
-    font-size: 12px;
+    font-size: 13px;
     color: #e85d3a;
-    background: none;
-    border: none;
     font-family: 'Helvetica Neue', Helvetica, sans-serif;
     cursor: pointer;
-    font-weight: 400;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(55,55,55,0.95) 0%, rgba(38,38,38,0.98) 100%);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow:
+      0 2px 6px rgba(0,0,0,0.35),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    transition:
+      transform var(--press-ms) var(--press-ease),
+      box-shadow var(--press-ms) var(--press-ease),
+      filter var(--press-ms) var(--press-ease);
+  }
+
+  .top-bar-back:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow:
+      0 1px 3px rgba(0,0,0,0.4),
+      inset 0 2px 6px rgba(0,0,0,0.25);
+    filter: brightness(0.92);
   }
 
   .top-bar-title {
-    font-size: 11px;
+    font-size: 13px;
     color: #aaa;
     letter-spacing: 3px;
     font-weight: 300;
@@ -177,7 +199,7 @@
   }
 
   .top-bar-count {
-    font-size: 11px;
+    font-size: 13px;
     color: #666;
     font-weight: 300;
   }
@@ -187,6 +209,7 @@
   /* ========================================= */
   .bottom-nav {
     background: linear-gradient(180deg, #333 0%, #2a2a2a 50%, #222 100%);
+    background-color: #222;
     padding: 18px 24px;
     padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
     display: flex;
@@ -195,6 +218,19 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.3);
     flex-shrink: 0;
     z-index: 5;
+    position: relative;
+  }
+
+  .bottom-nav::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: env(safe-area-inset-bottom, 0px);
+    background: #222;
+    pointer-events: none;
+    transform: translateY(100%);
   }
 
   .nav-btn {
@@ -215,23 +251,27 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: linear-gradient(180deg, #484848 0%, #3a3a3a 40%, #2e2e2e 100%);
-    border: 1px solid #555;
+    background: linear-gradient(180deg, #505050 0%, #3a3a3a 40%, #2a2a2a 100%);
+    border: 1px solid #5a5a5a;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 14px;
     box-shadow:
-      0 3px 8px rgba(0,0,0,0.4),
-      0 1px 2px rgba(0,0,0,0.3),
-      inset 0 1px 0 rgba(255,255,255,0.12),
-      inset 0 -1px 0 rgba(0,0,0,0.2);
-    transition: all 0.1s;
+      0 4px 10px rgba(0,0,0,0.45),
+      0 1px 3px rgba(0,0,0,0.35),
+      inset 0 1px 0 rgba(255,255,255,0.14),
+      inset 0 -2px 0 rgba(0,0,0,0.25);
+    transition:
+      transform var(--press-ms) var(--press-ease),
+      box-shadow var(--press-ms) var(--press-ease);
   }
 
   .nav-dot:active {
-    transform: translateY(1px);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.4), inset 0 1px 3px rgba(0,0,0,0.2);
+    transform: translateY(2px) scale(0.96);
+    box-shadow:
+      0 1px 4px rgba(0,0,0,0.4),
+      inset 0 2px 6px rgba(0,0,0,0.35);
   }
 
   .nav-btn.active .nav-dot {
@@ -246,7 +286,7 @@
   }
 
   .nav-label {
-    font-size: 8px;
+    font-size: 13px;
     letter-spacing: 2px;
     text-transform: uppercase;
     font-weight: 400;
@@ -257,6 +297,7 @@
   /* ========================================= */
   .screen-body {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
@@ -272,19 +313,65 @@
   /* SHARED LABELS                             */
   /* ========================================= */
   .label-muted {
-    font-size: 9px;
+    font-size: 13px;
     font-weight: 500;
     letter-spacing: 3px;
-    color: #b0a89c;
+    color: #574d42;
     text-transform: uppercase;
   }
 
   .label-tiny {
-    font-size: 8px;
+    font-size: 13px;
     font-weight: 500;
     letter-spacing: 2px;
-    color: #b0a89c;
+    color: #574d42;
     text-transform: uppercase;
+  }
+
+  /* Muted / secondary labels — uniform 13px; color/weight/italic from overrides */
+  .text-secondary,
+  .field-unit,
+  .target-label,
+  .exercise-card-meta,
+  .exercise-card-meta span,
+  .event-detail-label,
+  .progress-label,
+  .gauge-label,
+  .prev-results-label,
+  .prev-result-set .prs-label,
+  .event-workout-label,
+  .nav-label,
+  .phase-label,
+  .label-muted,
+  .screen-title .subtitle,
+  .week-header-phase,
+  .day-workout-focus,
+  .last-session-header,
+  .login-field-label,
+  .login-panel-title {
+    font-size: 13px;
+    color: #574d42;
+    letter-spacing: 0.12em;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .prev-result-set .prs-reps {
+    font-size: 13px;
+    color: #574d42;
+  }
+
+  .event-details {
+    color: #6a6258;
+  }
+
+  /* Tactile press timing (visual “click” — no real haptics on iOS web) */
+  :root {
+    --press-ms: 0.12s;
+    --press-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  button:not(:disabled) {
+    touch-action: manipulation;
   }
 
   /* ========================================= */
@@ -293,8 +380,8 @@
   .btn-primary {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(180deg, #ef7050 0%, #e85d3a 40%, #d4522f 100%);
-    border: none;
+    background: linear-gradient(180deg, #f07858 0%, #e85d3a 38%, #cf4a28 100%);
+    border: 1px solid rgba(0,0,0,0.16);
     border-radius: 50px;
     color: #fff;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -304,31 +391,61 @@
     text-transform: uppercase;
     cursor: pointer;
     box-shadow:
-      0 4px 12px rgba(232, 93, 58, 0.35),
-      0 2px 4px rgba(0,0,0,0.12),
-      inset 0 2px 0 rgba(255,255,255,0.25),
-      inset 0 -2px 0 rgba(0,0,0,0.15);
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    transition: all 0.1s;
+      0 5px 14px rgba(232, 93, 58, 0.4),
+      0 2px 5px rgba(0,0,0,0.14),
+      0 1px 0 rgba(255,255,255,0.12) inset,
+      inset 0 2px 0 rgba(255,255,255,0.28),
+      inset 0 -3px 0 rgba(0,0,0,0.2);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.22);
+    transition:
+      transform var(--press-ms) var(--press-ease),
+      box-shadow var(--press-ms) var(--press-ease),
+      filter var(--press-ms) var(--press-ease);
   }
 
-  .btn-primary:active {
-    transform: translateY(2px);
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(3px) scale(0.99);
     box-shadow:
-      0 1px 4px rgba(232, 93, 58, 0.25),
-      0 1px 2px rgba(0,0,0,0.1),
-      inset 0 2px 4px rgba(0,0,0,0.15);
+      0 2px 6px rgba(232, 93, 58, 0.3),
+      0 1px 2px rgba(0,0,0,0.12),
+      inset 0 3px 8px rgba(0,0,0,0.22),
+      inset 0 1px 0 rgba(0,0,0,0.08);
+    filter: brightness(0.94);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover:not(:disabled):not(:active) {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+      box-shadow:
+        0 7px 18px rgba(232, 93, 58, 0.45),
+        0 3px 6px rgba(0,0,0,0.12),
+        0 1px 0 rgba(255,255,255,0.12) inset,
+        inset 0 2px 0 rgba(255,255,255,0.32),
+        inset 0 -3px 0 rgba(0,0,0,0.18);
+    }
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    filter: grayscale(0.12);
+    box-shadow:
+      0 2px 6px rgba(0,0,0,0.1),
+      inset 0 2px 0 rgba(255,255,255,0.15),
+      inset 0 -2px 0 rgba(0,0,0,0.12);
   }
 
   /* Secondary button (raised cream) */
   .btn-secondary {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(180deg, #f0ece4 0%, #e2ddd3 100%);
-    border: 1px solid #ccc8be;
+    background: linear-gradient(180deg, #f5f1ea 0%, #e2ddd3 100%);
+    border: 1px solid #b8b2a6;
     border-radius: 50px;
     font-family: 'Helvetica Neue', Helvetica, sans-serif;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 400;
     letter-spacing: 2px;
     color: #888;
@@ -336,26 +453,37 @@
     cursor: pointer;
     text-transform: uppercase;
     box-shadow:
-      0 3px 6px rgba(0,0,0,0.08),
-      inset 0 1px 0 rgba(255,255,255,0.6),
-      inset 0 -1px 0 rgba(0,0,0,0.06);
-    transition: all 0.1s;
+      0 4px 8px rgba(0,0,0,0.1),
+      0 1px 2px rgba(0,0,0,0.06),
+      inset 0 2px 0 rgba(255,255,255,0.75),
+      inset 0 -2px 0 rgba(0,0,0,0.06);
+    transition:
+      transform var(--press-ms) var(--press-ease),
+      box-shadow var(--press-ms) var(--press-ease);
   }
 
   .btn-secondary:active {
-    transform: translateY(1px);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.08), inset 0 1px 3px rgba(0,0,0,0.1);
+    transform: translateY(2px) scale(0.995);
+    box-shadow:
+      0 1px 3px rgba(0,0,0,0.08),
+      inset 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn-secondary:hover:not(:active) {
+      transform: translateY(-1px);
+    }
   }
 
   /* Danger button */
   .btn-danger {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(180deg, #f0ece4 0%, #e2ddd3 100%);
-    border: 1px solid #d4a0a0;
+    background: linear-gradient(180deg, #f5f1ea 0%, #e8e2da 100%);
+    border: 1px solid #c89898;
     border-radius: 50px;
     font-family: 'Helvetica Neue', Helvetica, sans-serif;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 400;
     letter-spacing: 2px;
     color: #c0605a;
@@ -363,15 +491,26 @@
     cursor: pointer;
     text-transform: uppercase;
     box-shadow:
-      0 3px 6px rgba(0,0,0,0.08),
-      inset 0 1px 0 rgba(255,255,255,0.6),
-      inset 0 -1px 0 rgba(0,0,0,0.06);
-    transition: all 0.1s;
+      0 4px 8px rgba(0,0,0,0.1),
+      0 1px 2px rgba(0,0,0,0.06),
+      inset 0 2px 0 rgba(255,255,255,0.75),
+      inset 0 -2px 0 rgba(0,0,0,0.06);
+    transition:
+      transform var(--press-ms) var(--press-ease),
+      box-shadow var(--press-ms) var(--press-ease);
   }
 
   .btn-danger:active {
-    transform: translateY(1px);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.08), inset 0 1px 3px rgba(0,0,0,0.1);
+    transform: translateY(2px) scale(0.995);
+    box-shadow:
+      0 1px 3px rgba(0,0,0,0.08),
+      inset 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn-danger:hover:not(:active) {
+      transform: translateY(-1px);
+    }
   }
 
   /* ========================================= */
@@ -452,7 +591,7 @@
   #screen-login {
     justify-content: center;
     align-items: center;
-    padding: 40px 28px;
+    padding: calc(40px + env(safe-area-inset-top, 0px)) 28px calc(40px + env(safe-area-inset-bottom, 0px));
   }
 
   .login-shell {
@@ -474,7 +613,7 @@
   }
 
   .login-brand-model {
-    font-size: 9px;
+    font-size: 13px;
     color: #b0a89c;
     letter-spacing: 3px;
     margin-top: 6px;
@@ -500,7 +639,7 @@
   }
 
   .login-panel-title {
-    font-size: 9px;
+    font-size: 13px;
     font-weight: 500;
     letter-spacing: 3px;
     color: #a09888;
@@ -514,7 +653,7 @@
   }
 
   .login-field-label {
-    font-size: 8px;
+    font-size: 13px;
     font-weight: 500;
     letter-spacing: 2px;
     color: #b0a89c;
@@ -536,7 +675,7 @@
   }
 
   .login-toggle-text {
-    font-size: 11px;
+    font-size: 13px;
     color: #999;
     font-weight: 300;
   }
@@ -544,19 +683,33 @@
   .login-toggle-link {
     color: #e85d3a;
     cursor: pointer;
-    font-weight: 400;
-    background: none;
-    border: none;
+    font-weight: 500;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(232, 93, 58, 0.35);
+    border-radius: 20px;
+    padding: 8px 14px;
     font-family: 'Helvetica Neue', Helvetica, sans-serif;
-    font-size: 11px;
-    text-decoration: underline;
-    text-underline-offset: 2px;
+    font-size: 13px;
+    text-decoration: none;
+    box-shadow:
+      0 2px 5px rgba(0,0,0,0.06),
+      inset 0 1px 0 rgba(255,255,255,0.9);
+    transition:
+      transform var(--press-ms) var(--press-ease),
+      box-shadow var(--press-ms) var(--press-ease),
+      filter var(--press-ms) var(--press-ease);
+  }
+
+  .login-toggle-link:active {
+    transform: scale(0.97);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.08);
+    filter: brightness(0.96);
   }
 
   .login-error {
     display: none;
     text-align: center;
-    font-size: 11px;
+    font-size: 13px;
     color: #c0605a;
     margin-top: 12px;
     padding: 8px 12px;
@@ -586,9 +739,9 @@
   }
 
   .phase-label {
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 500;
-    color: #b0a89c;
+    color: #574d42;
     letter-spacing: 3px;
     text-transform: uppercase;
     margin-top: 4px;
@@ -616,10 +769,10 @@
     padding: 10px 14px;
     background: linear-gradient(180deg, #f0ece4, #ebe6dc);
     border-bottom: 1px solid #ddd8ce;
-    font-size: 9px;
+    font-size: 13px;
     font-weight: 500;
     letter-spacing: 3px;
-    color: #a09888;
+    color: #574d42;
     text-transform: uppercase;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
     display: flex;
@@ -628,7 +781,7 @@
   }
 
   .last-session-date {
-    font-size: 9px;
+    font-size: 13px;
     color: #bbb;
     letter-spacing: 1px;
     font-weight: 300;
@@ -676,10 +829,10 @@
   }
 
   .gauge-label {
-    font-size: 8px;
+    font-size: 13px;
     font-weight: 500;
     letter-spacing: 2px;
-    color: #b0a89c;
+    color: #574d42;
     text-transform: uppercase;
     margin-top: 2px;
   }
@@ -709,7 +862,7 @@
   }
 
   .event-date-day {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 400;
     color: rgba(255,255,255,0.7);
     text-transform: uppercase;
@@ -729,10 +882,10 @@
   }
 
   .event-workout-label {
-    font-size: 9px;
+    font-size: 13px;
     font-weight: 500;
     letter-spacing: 3px;
-    color: #b0a89c;
+    color: #574d42;
     text-transform: uppercase;
     margin-bottom: 6px;
   }
@@ -745,7 +898,7 @@
   }
 
   .event-workout-focus {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 400;
     color: #888;
     margin-bottom: 12px;
@@ -754,11 +907,55 @@
   .event-details {
     display: flex;
     gap: 20px;
-    font-size: 11px;
+    font-size: 13px;
     color: #aaa;
     margin-bottom: 16px;
     padding-bottom: 16px;
     border-bottom: 1px solid #f0ece4;
+  }
+
+  /* Dashboard: today’s workout finished (rolls forward next calendar day PST) */
+  .workout-event.workout-event--completed {
+    border: 1px solid rgba(255,255,255,0.35);
+    box-shadow:
+      0 6px 20px rgba(55, 110, 65, 0.35),
+      inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+
+  .workout-event.workout-event--completed .event-date-tab {
+    background: linear-gradient(180deg, #6ab070 0%, #4a8550 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.25),
+      inset 0 -1px 0 rgba(0,0,0,0.12);
+  }
+
+  .workout-event.workout-event--completed .event-body {
+    background: linear-gradient(180deg, #5f9a68 0%, #3d6f46 100%);
+  }
+
+  .workout-event.workout-event--completed .event-workout-label {
+    color: rgba(255,255,255,0.9);
+  }
+
+  .workout-event.workout-event--completed .event-workout-name {
+    color: #fff;
+  }
+
+  .workout-event.workout-event--completed .event-workout-focus {
+    color: rgba(255,255,255,0.92);
+  }
+
+  .workout-event.workout-event--completed .event-details {
+    color: rgba(255,255,255,0.8);
+    border-bottom-color: rgba(255,255,255,0.22);
+  }
+
+  .workout-event.workout-event--completed .event-detail-value {
+    color: rgba(255,255,255,0.98);
+  }
+
+  .workout-event.workout-event--completed .event-detail-label {
+    color: rgba(255,255,255,0.78);
   }
 
   .event-detail-item {
@@ -768,15 +965,15 @@
   }
 
   .event-detail-value {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 400;
     color: #555;
   }
 
   .event-detail-label {
-    font-size: 8px;
+    font-size: 13px;
     letter-spacing: 2px;
-    color: #b0a89c;
+    color: #574d42;
     text-transform: uppercase;
   }
 
@@ -811,16 +1008,43 @@
   .progress-dots {
     display: flex;
     justify-content: space-between;
-    padding: 8px 2px 0;
+    align-items: center;
+    padding: 10px 2px 0;
+    gap: 4px;
+  }
+
+  button.progress-dot {
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+    display: block;
+    line-height: 0;
   }
 
   .progress-dot {
-    width: 8px;
-    height: 8px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    background: linear-gradient(180deg, #f0ece4, #e2ddd3);
-    border: 1px solid #ccc8be;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.5);
+    background: linear-gradient(180deg, #f5f1ea, #e2ddd3);
+    border: 1px solid #b8b2a6;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.1),
+      inset 0 1px 0 rgba(255,255,255,0.65);
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition:
+      transform var(--press-ms) var(--press-ease),
+      box-shadow var(--press-ms) var(--press-ease);
+  }
+
+  .progress-dot:active {
+    transform: scale(0.88);
+    box-shadow:
+      0 1px 2px rgba(0,0,0,0.12),
+      inset 0 2px 4px rgba(0,0,0,0.12);
   }
 
   .progress-dot.completed {
@@ -832,12 +1056,21 @@
   .progress-dot.current {
     border: 2px solid #e85d3a;
     background: #fff;
-    box-shadow: 0 0 0 2px rgba(232, 93, 58, 0.15);
+    box-shadow:
+      0 0 0 3px rgba(255,255,255,0.95),
+      0 0 0 5px rgba(232, 93, 58, 0.55);
+  }
+
+  .progress-dot.current.completed {
+    box-shadow:
+      0 0 0 3px rgba(255,245,240,0.9),
+      0 0 0 5px rgba(232, 93, 58, 0.5),
+      0 1px 3px rgba(232, 93, 58, 0.35);
   }
 
   .progress-label {
-    font-size: 9px;
-    color: #b0a89c;
+    font-size: 13px;
+    color: #574d42;
     text-align: right;
     margin-top: 4px;
     letter-spacing: 1px;
@@ -880,7 +1113,7 @@
   }
 
   .completed-badge {
-    font-size: 8px;
+    font-size: 13px;
     font-weight: 500;
     letter-spacing: 2px;
     color: #6ab070;
@@ -896,16 +1129,16 @@
 
   .exercise-card-meta {
     margin-top: 6px;
-    font-size: 10px;
-    color: #aaa;
+    font-size: 13px;
+    color: #574d42;
     display: flex;
     gap: 12px;
-    letter-spacing: 1px;
+    letter-spacing: 0.06em;
   }
 
   .exercise-card-note {
     margin-top: 8px;
-    font-size: 10px;
+    font-size: 13px;
     color: #b08040;
     padding: 6px 10px;
     background: #fdf8f0;
@@ -921,10 +1154,10 @@
   }
 
   .prev-results-label {
-    font-size: 8px;
+    font-size: 13px;
     font-weight: 500;
     letter-spacing: 3px;
-    color: #a09888;
+    color: #574d42;
     text-transform: uppercase;
     margin-bottom: 8px;
   }
@@ -939,9 +1172,9 @@
     flex: 1;
   }
 
-  .prev-result-set .prs-label { font-size: 8px; color: #b0a89c; letter-spacing: 1px; }
+  .prev-result-set .prs-label { font-size: 13px; color: #574d42; letter-spacing: 1px; }
   .prev-result-set .prs-weight { font-size: 24px; font-weight: 200; color: #2c2c2c; margin-top: 2px; }
-  .prev-result-set .prs-reps { font-size: 11px; color: #888; }
+  .prev-result-set .prs-reps { font-size: 13px; color: #574d42; }
 
   /* Set input rows */
   .set-inputs {
@@ -974,11 +1207,21 @@
   }
 
   .set-input-row.row-done {
-    opacity: 0.65;
+    opacity: 1;
+    background: linear-gradient(180deg, #e8f4ea 0%, #dceee6 100%);
+    border-color: #9bc4a8;
+    box-shadow:
+      0 2px 6px rgba(106, 176, 112, 0.15),
+      inset 0 1px 0 rgba(255,255,255,0.85);
+  }
+
+  .set-input-row.row-done .field-unit,
+  .set-input-row.row-done .field-x {
+    color: #4a6b55;
   }
 
   .set-number {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     color: #b0a89c;
     width: 20px;
@@ -989,9 +1232,9 @@
   .set-number.done { color: #e85d3a; }
 
   .field-unit {
-    font-size: 8px;
-    color: #b0a89c;
-    letter-spacing: 1px;
+    font-size: 13px;
+    color: #574d42;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     flex-shrink: 0;
   }
@@ -1010,44 +1253,62 @@
 
   /* Check button */
   .set-check {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: linear-gradient(180deg, #f0ece4 0%, #e2ddd3 100%);
-    border: 1px solid #ccc8be;
+    min-width: 48px;
+    width: auto;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 20px;
+    background: linear-gradient(180deg, #f5f1ea 0%, #e2ddd3 100%);
+    border: 1px solid #b8b2a6;
     color: #ccc;
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow:
-      0 2px 4px rgba(0,0,0,0.08),
-      inset 0 1px 0 rgba(255,255,255,0.6),
-      inset 0 -1px 0 rgba(0,0,0,0.06);
-    transition: all 0.1s;
+      0 3px 6px rgba(0,0,0,0.1),
+      inset 0 2px 0 rgba(255,255,255,0.7),
+      inset 0 -2px 0 rgba(0,0,0,0.06);
+    transition:
+      transform var(--press-ms) var(--press-ease),
+      box-shadow var(--press-ms) var(--press-ease);
     flex-shrink: 0;
   }
 
   .set-check:active {
-    transform: translateY(1px);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.08), inset 0 1px 3px rgba(0,0,0,0.1);
+    transform: translateY(2px) scale(0.98);
+    box-shadow:
+      0 1px 3px rgba(0,0,0,0.08),
+      inset 0 2px 5px rgba(0,0,0,0.1);
   }
 
   .set-check.checked {
-    background: linear-gradient(180deg, #ef7050 0%, #e85d3a 40%, #d4522f 100%);
-    border-color: #d4522f;
+    background: linear-gradient(180deg, #f07858 0%, #e85d3a 38%, #cf4a28 100%);
+    border: 1px solid rgba(0,0,0,0.14);
+    border-color: #b84222;
     color: #fff;
     box-shadow:
-      0 2px 6px rgba(232, 93, 58, 0.3),
-      inset 0 1px 0 rgba(255,255,255,0.2),
-      inset 0 -1px 0 rgba(0,0,0,0.15);
+      0 3px 10px rgba(232, 93, 58, 0.38),
+      0 1px 2px rgba(0,0,0,0.1),
+      inset 0 1px 0 rgba(255,255,255,0.22),
+      inset 0 -2px 0 rgba(0,0,0,0.18);
+  }
+
+  .set-check.checked:active {
+    transform: translateY(2px) scale(0.98);
+    box-shadow:
+      0 1px 4px rgba(232, 93, 58, 0.3),
+      inset 0 3px 8px rgba(0,0,0,0.2);
+    filter: brightness(0.94);
   }
 
   .target-label {
     text-align: center;
-    font-size: 9px;
-    color: #b0a89c;
+    font-size: 13px;
+    color: #574d42;
     margin-top: -2px;
     margin-bottom: 10px;
     letter-spacing: 1px;
@@ -1078,23 +1339,27 @@
   }
 
   .timer-action {
-    background: linear-gradient(180deg, #f0ece4, #e2ddd3);
-    border: 1px solid #ccc8be;
+    background: linear-gradient(180deg, #f5f1ea, #e2ddd3);
+    border: 1px solid #b8b2a6;
     border-radius: 50px;
     padding: 6px 16px;
     font-family: 'Helvetica Neue', Helvetica, sans-serif;
-    font-size: 10px;
+    font-size: 13px;
     color: #888;
     cursor: pointer;
     letter-spacing: 1px;
     box-shadow:
-      0 2px 4px rgba(0,0,0,0.06),
-      inset 0 1px 0 rgba(255,255,255,0.6);
+      0 3px 6px rgba(0,0,0,0.1),
+      inset 0 2px 0 rgba(255,255,255,0.7),
+      inset 0 -2px 0 rgba(0,0,0,0.06);
+    transition:
+      transform var(--press-ms) var(--press-ease),
+      box-shadow var(--press-ms) var(--press-ease);
   }
 
   .timer-action:active {
-    transform: translateY(1px);
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    transform: translateY(2px) scale(0.98);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.12);
   }
 
   /* Exercise nav pills */
@@ -1108,11 +1373,11 @@
   .enav-btn {
     flex: 1;
     padding: 14px;
-    background: linear-gradient(180deg, #f0ece4 0%, #e2ddd3 100%);
-    border: 1px solid #ccc8be;
+    background: linear-gradient(180deg, #f5f1ea 0%, #e2ddd3 100%);
+    border: 1px solid #b8b2a6;
     border-radius: 50px;
     font-family: 'Helvetica Neue', Helvetica, sans-serif;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 400;
     letter-spacing: 2px;
     color: #888;
@@ -1120,29 +1385,180 @@
     cursor: pointer;
     text-transform: uppercase;
     box-shadow:
-      0 3px 6px rgba(0,0,0,0.08),
-      inset 0 1px 0 rgba(255,255,255,0.6),
-      inset 0 -1px 0 rgba(0,0,0,0.06);
-    transition: all 0.1s;
+      0 4px 8px rgba(0,0,0,0.1),
+      0 1px 2px rgba(0,0,0,0.06),
+      inset 0 2px 0 rgba(255,255,255,0.72),
+      inset 0 -2px 0 rgba(0,0,0,0.06);
+    transition:
+      transform var(--press-ms) var(--press-ease),
+      box-shadow var(--press-ms) var(--press-ease),
+      filter var(--press-ms) var(--press-ease);
   }
 
   .enav-btn:active {
-    transform: translateY(1px);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.08), inset 0 1px 3px rgba(0,0,0,0.1);
+    transform: translateY(2px) scale(0.995);
+    box-shadow:
+      0 1px 3px rgba(0,0,0,0.08),
+      inset 0 2px 5px rgba(0,0,0,0.1);
   }
 
   .enav-btn.enav-next {
-    background: linear-gradient(180deg, #ef7050 0%, #e85d3a 40%, #d4522f 100%);
-    border-color: #c84a28;
+    background: linear-gradient(180deg, #f07858 0%, #e85d3a 38%, #cf4a28 100%);
+    border: 1px solid rgba(0,0,0,0.14);
+    border-color: #b84222;
     color: #fff;
     box-shadow:
-      0 3px 8px rgba(232, 93, 58, 0.3),
-      0 1px 2px rgba(0,0,0,0.1),
-      inset 0 1px 0 rgba(255,255,255,0.2),
-      inset 0 -1px 0 rgba(0,0,0,0.15);
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      0 4px 12px rgba(232, 93, 58, 0.38),
+      0 1px 3px rgba(0,0,0,0.12),
+      inset 0 2px 0 rgba(255,255,255,0.24),
+      inset 0 -3px 0 rgba(0,0,0,0.18);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.22);
   }
 
+  .enav-btn.enav-next:active {
+    transform: translateY(3px) scale(0.99);
+    box-shadow:
+      0 2px 6px rgba(232, 93, 58, 0.28),
+      inset 0 3px 8px rgba(0,0,0,0.22);
+    filter: brightness(0.94);
+  }
+
+  .exercise-complete-wrap {
+    padding: 4px 16px 8px;
+    background: #fdfcfa;
+  }
+
+  .exercise-complete-wrap[hidden] {
+    display: none !important;
+  }
+
+  #btn-complete-workout {
+    width: 100%;
+  }
+
+  #btn-complete-workout:disabled {
+    opacity: 0.6;
+    cursor: wait;
+    transform: none;
+    filter: grayscale(0.2);
+  }
+
+  /* Schedule: workout complete stamp + card flip */
+  @keyframes schedule-stamp-smash {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.05); filter: brightness(1.1); }
+    55% { transform: scale(0.99); }
+    100% { transform: scale(1); filter: brightness(1); }
+  }
+
+  .day-row.day-row--stamp {
+    animation: schedule-stamp-smash 0.55s cubic-bezier(0.34, 1.45, 0.64, 1);
+  }
+
+  .day-row.day-row--celebration-lock {
+    pointer-events: none;
+  }
+
+  .day-row.day-row--celebration-lock .btn-onward {
+    pointer-events: auto;
+  }
+
+  .day-row-flip-inner {
+    position: relative;
+    width: 100%;
+    min-height: 58px;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .day-row-flip-inner.is-flipped {
+    transform: rotateY(180deg);
+  }
+
+  .day-row-face--front {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    padding: 10px 12px;
+    border-radius: 8px;
+  }
+
+  .day-row-face--back {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 16px;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #4d8f56 0%, #3a7042 100%);
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+    transform: rotateY(180deg);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .day-back-inner {
+    text-align: center;
+    width: 100%;
+  }
+
+  .day-back-volume {
+    font-size: 38px;
+    font-weight: 200;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    line-height: 1.1;
+  }
+
+  .day-back-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.88);
+    margin-top: 6px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .btn-onward {
+    margin-top: 16px;
+    padding: 12px 32px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.45);
+    font-family: 'Helvetica Neue', Helvetica, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    background: linear-gradient(180deg, #e8fff0 0%, #b8e8c4 100%);
+    color: #1f5a2a;
+    box-shadow:
+      0 4px 12px rgba(0,0,0,0.2),
+      inset 0 1px 0 rgba(255,255,255,0.9);
+    transition:
+      transform var(--press-ms) var(--press-ease),
+      box-shadow var(--press-ms) var(--press-ease);
+  }
+
+  .btn-onward:active {
+    transform: translateY(2px) scale(0.98);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .day-row.day-row--stamp {
+      animation: none;
+    }
+
+    .day-row-flip-inner {
+      transition: transform 0.25s ease;
+    }
+  }
 
   /* ================================================================ */
   /*                                                                  */
@@ -1163,7 +1579,7 @@
   }
 
   .screen-title .subtitle {
-    font-size: 10px;
+    font-size: 13px;
     color: #b0a89c;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -1185,7 +1601,7 @@
   }
 
   .week-header-title {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     color: #888;
     letter-spacing: 2px;
@@ -1193,38 +1609,54 @@
   }
 
   .week-header-phase {
-    font-size: 9px;
+    font-size: 13px;
     color: #b0a89c;
     letter-spacing: 1px;
   }
 
   /* Day rows */
   .day-row {
-    display: flex;
-    align-items: center;
-    padding: 10px 12px;
     margin-bottom: 3px;
     border-radius: 8px;
     background: linear-gradient(180deg, #faf8f4 0%, #f4f0e8 100%);
     border: 1px solid #ddd8ce;
     box-shadow:
-      0 2px 4px rgba(0,0,0,0.05),
-      0 1px 2px rgba(0,0,0,0.03),
-      inset 0 1px 0 rgba(255,255,255,0.7);
+      0 3px 6px rgba(0,0,0,0.07),
+      0 1px 2px rgba(0,0,0,0.04),
+      inset 0 1px 0 rgba(255,255,255,0.75);
     cursor: pointer;
-    transition: all 0.15s;
+    perspective: 1000px;
+    transition:
+      transform var(--press-ms) var(--press-ease),
+      box-shadow var(--press-ms) var(--press-ease);
   }
 
-  .day-row:active {
-    transform: translateY(1px);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0 1px 3px rgba(0,0,0,0.06);
+  .day-row:active:not(.day-row--celebration-lock) {
+    transform: translateY(2px) scale(0.995);
+    box-shadow:
+      0 1px 3px rgba(0,0,0,0.06),
+      inset 0 2px 4px rgba(0,0,0,0.07);
   }
 
   .day-row.completed {
-    border-left: 3px solid #6ab070;
+    background: linear-gradient(180deg, #6ab070 0%, #529959 42%, #417848 100%);
+    border: 1px solid rgba(255,255,255,0.28);
+    box-shadow:
+      0 4px 14px rgba(65, 120, 72, 0.4),
+      0 1px 3px rgba(0,0,0,0.12),
+      inset 0 1px 0 rgba(255,255,255,0.28);
   }
 
-  .day-row.current {
+  .day-row.rest.completed {
+    background: linear-gradient(180deg, #5f9a68 0%, #4a8354 45%, #3d6f46 100%);
+    border: 1px solid rgba(255,255,255,0.25);
+    cursor: pointer;
+    box-shadow:
+      0 4px 14px rgba(61, 111, 70, 0.38),
+      inset 0 1px 0 rgba(255,255,255,0.22);
+  }
+
+  .day-row.current:not(.completed) {
     border: 2px solid #e85d3a;
     background: linear-gradient(180deg, #fff 0%, #fdfaf6 100%);
     box-shadow:
@@ -1237,7 +1669,7 @@
     opacity: 0.55;
   }
 
-  .day-row.rest {
+  .day-row.rest:not(.completed) {
     background: linear-gradient(180deg, #f0ece4 0%, #ebe6dc 100%);
     border-color: #d8d3c8;
     cursor: default;
@@ -1246,9 +1678,46 @@
       inset 0 1px 0 rgba(255,255,255,0.5);
   }
 
-  .day-row.rest:active {
+  .day-row.rest:not(.completed):active {
     transform: none;
     box-shadow: 0 1px 2px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.5);
+  }
+
+  .day-row.completed .day-workout-name {
+    color: #fff;
+    font-weight: 500;
+  }
+
+  .day-row.completed .day-workout-focus {
+    color: rgba(255,255,255,0.88);
+  }
+
+  .day-row.rest.completed .day-workout-name {
+    color: rgba(255,255,255,0.96);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .day-row.completed .day-date {
+    font-size: 24px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.98);
+    letter-spacing: 0.02em;
+    line-height: 1.05;
+  }
+
+  .day-row.completed .day-today-badge {
+    color: rgba(255,255,255,0.95);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+
+  .day-row.completed .day-number {
+    background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.12) 100%);
+    border-color: rgba(255,255,255,0.45);
+    color: #fff;
+    box-shadow:
+      0 2px 8px rgba(0,0,0,0.12),
+      inset 0 1px 0 rgba(255,255,255,0.45);
   }
 
   .day-number {
@@ -1258,7 +1727,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     margin-right: 12px;
     flex-shrink: 0;
@@ -1270,16 +1739,7 @@
       inset 0 1px 0 rgba(255,255,255,0.6);
   }
 
-  .completed .day-number {
-    background: linear-gradient(180deg, #70b878 0%, #5aa062 100%);
-    border-color: #4a8a52;
-    color: #fff;
-    box-shadow:
-      0 2px 4px rgba(90, 160, 98, 0.25),
-      inset 0 1px 0 rgba(255,255,255,0.2);
-  }
-
-  .current .day-number {
+  .current:not(.completed) .day-number {
     background: linear-gradient(180deg, #ef7050 0%, #e85d3a 100%);
     border-color: #d4522f;
     color: #fff;
@@ -1288,7 +1748,7 @@
       inset 0 1px 0 rgba(255,255,255,0.2);
   }
 
-  .rest .day-number {
+  .rest:not(.completed) .day-number {
     background: linear-gradient(180deg, #e8e4dc 0%, #ddd8ce 100%);
     border-color: #ccc8be;
     color: #b0a89c;
@@ -1309,55 +1769,48 @@
     color: #2c2c2c;
   }
 
-  .rest .day-workout-name {
+  .rest:not(.completed) .day-workout-name {
     color: #aaa;
     font-weight: 300;
     font-style: italic;
   }
 
-  .current .day-workout-name {
+  .current:not(.completed) .day-workout-name {
     color: #2c2c2c;
     font-weight: 500;
   }
 
   .day-workout-focus {
-    font-size: 11px;
+    font-size: 13px;
     color: #999;
     margin-top: 1px;
-  }
-
-  .day-best-lift {
-    font-size: 10px;
-    color: #6ab070;
-    margin-top: 3px;
-    font-variant-numeric: tabular-nums;
   }
 
   .day-right {
     text-align: right;
     flex-shrink: 0;
     margin-left: 8px;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    min-width: 72px;
   }
 
   .day-date {
-    font-size: 10px;
+    font-size: 13px;
     color: #b0a89c;
     letter-spacing: 1px;
   }
 
-  .current .day-date {
+  .current:not(.completed) .day-date {
     color: #e85d3a;
     font-weight: 500;
   }
 
-  .day-check {
-    font-size: 12px;
-    color: #6ab070;
-    margin-top: 2px;
-  }
-
   .day-today-badge {
-    font-size: 8px;
+    font-size: 13px;
     font-weight: 500;
     letter-spacing: 2px;
     color: #e85d3a;
@@ -1378,7 +1831,7 @@
   }
 
   .settings-section-title {
-    font-size: 9px;
+    font-size: 13px;
     font-weight: 500;
     letter-spacing: 3px;
     color: #a09888;
@@ -1428,12 +1881,392 @@
     margin-left: 8px;
   }
 
+  .sync-status-synced {
+    color: #2e7d32;
+    font-weight: 500;
+  }
+
+  .sync-status-pending {
+    color: #b8860b;
+    font-weight: 500;
+  }
+
+  .sync-status-offline {
+    color: #c62828;
+    font-weight: 500;
+  }
+
+  .toast-host {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: max(24px, calc(env(safe-area-inset-bottom, 0px) + 88px));
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    pointer-events: none;
+  }
+
+  .toast {
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.28s ease, transform 0.28s ease;
+    pointer-events: auto;
+  }
+
+  .toast--show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .toast--info {
+    background: #2c2c2c;
+    color: #fff;
+  }
+
+  .toast--success {
+    background: #2e7d32;
+    color: #fff;
+  }
+
+  .toast--error {
+    background: #c62828;
+    color: #fff;
+  }
+
   .settings-buttons {
     padding: 0 16px;
     display: flex;
     flex-direction: column;
     gap: 10px;
     margin-bottom: 20px;
+  }
+
+  .btn-skip-rest {
+    margin-top: 10px;
+  }
+
+  .rest-activity-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0 14px;
+  }
+
+  .rest-activity-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: linear-gradient(180deg, #faf8f4, #f0ece4);
+    border: 1px solid #ddd8ce;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #2c2c2c;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .rest-activity-chip .chip-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .rest-activity-chip .chip-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(30, 28, 24, 0.45);
+    z-index: 2000;
+    align-items: flex-end;
+    justify-content: center;
+    padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
+  }
+
+  .modal-backdrop.open {
+    display: flex;
+  }
+
+  .modal-sheet {
+    width: 100%;
+    max-height: 88vh;
+    overflow-y: auto;
+    background: linear-gradient(180deg, #fdfcfa, #f5f1e8);
+    border-radius: 14px 14px 0 0;
+    border: 1px solid #c8c3b8;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.2);
+    padding: 18px 18px calc(22px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .modal-sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .modal-sheet-title {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    color: #574d42;
+    text-transform: uppercase;
+  }
+
+  .modal-close {
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: linear-gradient(180deg, #f5f1ea 0%, #e2ddd3 100%);
+    border: 1px solid #b8b2a6;
+    color: #e85d3a;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow:
+      0 3px 6px rgba(0,0,0,0.08),
+      inset 0 2px 0 rgba(255,255,255,0.75);
+    transition:
+      transform var(--press-ms) var(--press-ease),
+      box-shadow var(--press-ms) var(--press-ease);
+  }
+
+  .modal-close:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  .rest-activity-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .rest-activity-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid #ddd8ce;
+    border-radius: 10px;
+  }
+
+  .rest-activity-row .row-icon {
+    flex-shrink: 0;
+  }
+
+  .rest-activity-row .row-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .rest-activity-row .row-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #2c2c2c;
+  }
+
+  .rest-activity-row .row-mins-label {
+    font-size: 13px;
+    color: #574d42;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .rest-minutes-input {
+    width: 64px;
+    padding: 8px;
+    text-align: center;
+    font-size: 16px;
+    border: 1px solid #ccc8be;
+    border-radius: 8px;
+    font-family: inherit;
+  }
+
+  .rest-activity-row button.save-row {
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.14);
+    background: linear-gradient(180deg, #f07858 0%, #e85d3a 38%, #cf4a28 100%);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    cursor: pointer;
+    font-family: inherit;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    box-shadow:
+      0 3px 10px rgba(232, 93, 58, 0.38),
+      inset 0 1px 0 rgba(255,255,255,0.24),
+      inset 0 -2px 0 rgba(0,0,0,0.18);
+    transition:
+      transform var(--press-ms) var(--press-ease),
+      box-shadow var(--press-ms) var(--press-ease),
+      filter var(--press-ms) var(--press-ease);
+  }
+
+  .rest-activity-row button.save-row:active {
+    transform: translateY(2px) scale(0.98);
+    box-shadow:
+      0 1px 4px rgba(232, 93, 58, 0.3),
+      inset 0 3px 8px rgba(0,0,0,0.2);
+    filter: brightness(0.94);
+  }
+
+  .exercise-note-field-wrap {
+    padding: 0 0 8px;
+    margin-top: 4px;
+  }
+
+  .exercise-note-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    color: #574d42;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .exercise-note-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc8be;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    color: #2c2c2c;
+    background: #fff;
+    resize: none;
+    line-height: 1.4;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+  }
+
+  .exercise-note-input:focus {
+    outline: none;
+    border-color: #e85d3a;
+  }
+
+  .set-check.save-mode {
+    background: linear-gradient(180deg, #fff8f0, #ffe8d8);
+    border-color: #e85d3a;
+    color: #c44a28;
+  }
+
+  #screen-session-review .top-bar-back {
+    text-align: left;
+  }
+
+  .session-review-list {
+    padding: 12px 16px 24px;
+  }
+
+  .session-review-heading {
+    text-align: center;
+    padding: 8px 12px 16px;
+    font-size: 13px;
+    color: #574d42;
+    letter-spacing: 2px;
+  }
+
+  .session-review-block {
+    margin-bottom: 18px;
+    padding: 0;
+    background: #fff;
+    border: 1px solid #ddd8ce;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+
+  .session-review-exercise {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    padding: 12px 14px;
+    letter-spacing: 0.03em;
+    background: linear-gradient(180deg, #e85d3a 0%, #d4522f 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,0,0,0.08);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+
+  .session-review-sets {
+    padding: 12px 14px 14px;
+    background: linear-gradient(180deg, #fff 0%, #fdfcfa 100%);
+  }
+
+  .session-review-setline {
+    font-size: 14px;
+    color: #444;
+    padding: 5px 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rest-summary-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0ece4;
+  }
+
+  .rest-summary-row:last-child {
+    border-bottom: none;
+    padding-bottom: 2px;
+  }
+
+  .rest-summary-icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .rest-summary-icon svg {
+    width: 24px;
+    height: 24px;
+    display: block;
+  }
+
+  .rest-summary-label {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2c2c2c;
+  }
+
+  .rest-summary-mins {
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rest-summary-empty {
+    color: #888;
+    font-size: 14px;
+    padding: 8px 0 4px;
+    font-style: italic;
   }
 
 </style>
@@ -1535,11 +2368,11 @@
         </div>
 
         <div class="event-body">
-          <div class="event-workout-label">Today's Workout</div>
+          <div class="event-workout-label" id="dash-workout-label">Today's Workout</div>
           <div class="event-workout-name" id="dash-workout-name"></div>
           <div class="event-workout-focus" id="dash-workout-focus"></div>
 
-          <div class="event-details">
+          <div class="event-details" id="dash-event-details">
             <div class="event-detail-item">
               <span class="event-detail-value" id="dash-exercises-count">—</span>
               <span class="event-detail-label">Exercises</span>
@@ -1554,7 +2387,10 @@
             </div>
           </div>
 
+          <div class="rest-activity-chips" id="dash-rest-activity-chips" style="display:none;"></div>
+
           <button class="btn-primary" id="btn-start-workout">Start Workout</button>
+          <button type="button" class="btn-secondary btn-skip-rest" id="btn-skip-rest-day" style="display:none;">Complete Rest Day</button>
         </div>
       </div>
     </div>
@@ -1674,6 +2510,9 @@
           </div>
         </div>
 
+        <div class="exercise-complete-wrap" id="exercise-complete-wrap" hidden>
+          <button type="button" class="btn-primary" id="btn-complete-workout">Complete Workout</button>
+        </div>
         <!-- Navigation pills -->
         <div class="exercise-nav">
           <button class="enav-btn" id="btn-prev-exercise">&larr; Prev</button>
@@ -1682,7 +2521,6 @@
       </div>
     </div>
   </div>
-
 
   <!-- ============================================================ -->
   <!-- SCREEN 4: SCHEDULE                                            -->
@@ -1766,6 +2604,10 @@
             <span class="settings-row-label">Workouts Completed</span>
             <span class="settings-row-value" id="settings-completed">— / 54</span>
           </div>
+          <div class="settings-row">
+            <span class="settings-row-label">Data sync</span>
+            <span class="settings-row-value" id="settings-sync-status">—</span>
+          </div>
         </div>
       </div>
 
@@ -1830,6 +2672,30 @@
     </div>
   </div>
 
+  <!-- ============================================================ -->
+  <!-- SCREEN: SESSION REVIEW (from Schedule)                       -->
+  <!-- ============================================================ -->
+  <div id="screen-session-review" class="screen">
+    <div class="top-bar top-bar-logging">
+      <button type="button" class="top-bar-back" id="btn-session-review-back">&larr; Schedule</button>
+      <span class="top-bar-title" id="session-review-title">Workout</span>
+      <span class="top-bar-count"></span>
+    </div>
+    <div class="screen-body">
+      <div id="session-review-content" class="session-review-list"></div>
+    </div>
+  </div>
+
+  <div id="modal-rest-activities" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-sheet">
+      <div class="modal-sheet-header">
+        <span class="modal-sheet-title">Add activity for the day</span>
+        <button type="button" class="modal-close" id="btn-rest-modal-close">Close</button>
+      </div>
+      <div id="rest-activity-editor" class="rest-activity-grid"></div>
+    </div>
+  </div>
+
 
   <!-- ============================================================ -->
   <!-- JAVASCRIPT                                                    -->
@@ -1847,12 +2713,13 @@
       logging: document.getElementById('screen-logging'),
       schedule: document.getElementById('screen-schedule'),
       settings: document.getElementById('screen-settings'),
+      sessionReview: document.getElementById('screen-session-review'),
     };
 
     let currentScreen = 'login';
 
     // Screen order for determining slide direction
-    const screenOrder = ['login', 'dashboard', 'logging', 'schedule', 'settings'];
+    const screenOrder = ['login', 'dashboard', 'logging', 'schedule', 'sessionReview', 'settings'];
 
     function showScreen(name, animate = true) {
       if (name === currentScreen) return;
@@ -1886,8 +2753,9 @@
       currentScreen = name;
 
       // Update bottom nav active states across all nav bars
+      const navScreen = name === 'sessionReview' ? 'schedule' : name;
       document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.nav === name);
+        btn.classList.toggle('active', btn.dataset.nav === navScreen);
       });
     }
 
@@ -1910,8 +2778,10 @@
         if (!authInitialized || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
           if (currentScreen === 'login') {
             showScreen('dashboard', !authInitialized);
+          } else {
+            loadDashboard();
           }
-          loadDashboard();
+          flushSyncQueue().catch(() => {});
         }
       } else if (event === 'SIGNED_OUT') {
         currentUser = null;
@@ -1928,8 +2798,8 @@
       if (session && !authInitialized) {
         currentUser = session.user;
         showScreen('dashboard', false);
-        loadDashboard();
         authInitialized = true;
+        flushSyncQueue().catch(() => {});
       }
     }
 
@@ -1986,7 +2856,6 @@
       document.getElementById('login-email').value = '';
       document.getElementById('login-password').value = '';
       showScreen('dashboard');
-      loadDashboard();
     });
 
     // Allow Enter key to submit
@@ -1997,6 +2866,434 @@
     // ── Dashboard ─────────────────────────────────────────────────
     let programState = null; // { current_program_day, start_date }
     let todayEntry = null;   // PROGRAM.schedule entry for current day
+    let sessionReviewSessionId = null;
+
+    const REST_ACTIVITY_TYPES = [
+      { id: 'sauna', label: 'Sauna', svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="#e85d3a" d="M7 4c0 3 2 5 2 8s-2 5-2 8h2c0-2 1-3 1-5s-1-3-1-5 2-4 2-7H7zm4 0c0 3 1.5 4.5 1.5 7.5S11 16 11 20h2c0-2 .5-3 1-5 .5 2 1 3 1 5h2c0-3-1.5-4.5-1.5-7.5S15.5 7 15.5 4h-4.5zm5 0c0 3 2 4 2 7s-2 5-2 8h2v-4c1-1 1-2 1-4s-1-4-1-7h-2z"/></svg>' },
+      { id: 'walking', label: 'Walking', svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="#e85d3a" d="M13 5a2 2 0 10.001 4.001A2 2 0 0013 5zm-2 6l-2 8h2l1.2-4h1.6l1.2 4h2l-2.5-7.5L14 10l-1 1h-2z"/></svg>' },
+      { id: 'biking', label: 'Biking', svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="#e85d3a" d="M15.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM5 12c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm5.8-6l-1-2H9v2h1.2l1.2 2.4L11 20h2l1.5-7.5L18 8V6h-3l-1.5 2H14l-.7 1.5-.5-.5zM19 12c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>' },
+      { id: 'sun', label: 'Sun', svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="#e8a024" stroke="#c48818" stroke-width="0.5" d="M12 7a5 5 0 100 10 5 5 0 000-10zM12 1v2m0 18v2M4.2 4.2l1.4 1.4m12.8 12.8l1.4 1.4M1 12h2m18 0h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>' },
+    ];
+
+    async function fetchRestActivitiesMap(programDay) {
+      if (!currentUser) return {};
+      const { data, error } = await supabaseClient
+        .from('rest_day_activities')
+        .select('activity_type, minutes')
+        .eq('user_id', currentUser.id)
+        .eq('program_day', programDay);
+      if (error) { console.warn('rest_day_activities', error); return {}; }
+      const map = {};
+      (data || []).forEach(row => { if (row.minutes > 0) map[row.activity_type] = row.minutes; });
+      return map;
+    }
+
+    async function renderDashRestChips(programDay) {
+      const el = document.getElementById('dash-rest-activity-chips');
+      if (!el) return;
+      const map = await fetchRestActivitiesMap(programDay);
+      el.innerHTML = '';
+      REST_ACTIVITY_TYPES.forEach(def => {
+        const mins = map[def.id];
+        if (!mins) return;
+        const chip = document.createElement('div');
+        chip.className = 'rest-activity-chip';
+        chip.innerHTML = `<span class="chip-icon">${def.svg}</span><span>${def.label}</span><strong>${mins}m</strong>`;
+        el.appendChild(chip);
+      });
+    }
+
+    function openRestActivityModal() {
+      if (!programState || !currentUser) return;
+      const modal = document.getElementById('modal-rest-activities');
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      buildRestModalEditor();
+    }
+
+    function closeRestActivityModal() {
+      const modal = document.getElementById('modal-rest-activities');
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    async function buildRestModalEditor() {
+      const host = document.getElementById('rest-activity-editor');
+      if (!host || !programState) return;
+      const day = programState.current_program_day;
+      const map = await fetchRestActivitiesMap(day);
+      host.innerHTML = '';
+      REST_ACTIVITY_TYPES.forEach(def => {
+        const row = document.createElement('div');
+        row.className = 'rest-activity-row';
+        const val = map[def.id] != null ? map[def.id] : '';
+        row.innerHTML = `
+          <div class="row-icon">${def.svg}</div>
+          <div class="row-meta">
+            <div class="row-name">${def.label}</div>
+            <div class="row-mins-label">Minutes</div>
+          </div>
+          <input type="number" min="0" inputmode="numeric" class="rest-minutes-input" data-activity="${def.id}" value="${val === '' ? '' : val}" placeholder="0">
+          <button type="button" class="save-row" data-activity="${def.id}">Save</button>`;
+        host.appendChild(row);
+      });
+      host.querySelectorAll('.save-row').forEach(btn => {
+        btn.addEventListener('click', () => saveRestActivityRow(btn.dataset.activity));
+      });
+    }
+
+    async function saveRestActivityRow(activityType) {
+      if (!currentUser || !programState) return;
+      const host = document.getElementById('rest-activity-editor');
+      const input = host.querySelector(`input[data-activity="${activityType}"]`);
+      const raw = parseInt(input.value, 10);
+      const minutes = Number.isFinite(raw) ? Math.max(0, raw) : 0;
+      const day = programState.current_program_day;
+      await supabaseClient.from('rest_day_activities')
+        .delete()
+        .eq('user_id', currentUser.id)
+        .eq('program_day', day)
+        .eq('activity_type', activityType);
+      if (minutes > 0) {
+        await supabaseClient.from('rest_day_activities').insert({
+          user_id: currentUser.id,
+          program_day: day,
+          activity_type: activityType,
+          minutes,
+        });
+      }
+      await renderDashRestChips(day);
+      buildRestModalEditor();
+    }
+
+    const AMERICA_LOS_ANGELES = 'America/Los_Angeles';
+    const SYNC_QUEUE_KEY = 'lift_tracker_sync_queue';
+    const LEGACY_PENDING_SYNC_KEY = 'pendingSync';
+
+    const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    function newLogId() {
+      if (window.crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    /** Calendar YYYY-MM-DD → long date label in Los Angeles (matches “assignment day” semantics). */
+    function formatYmdLongLA(ymd) {
+      if (!ymd || typeof ymd !== 'string') return '—';
+      const parts = ymd.split('-').map(Number);
+      if (parts.length !== 3 || parts.some(n => !Number.isFinite(n))) return '—';
+      const [y, m, d] = parts;
+      const t = Date.UTC(y, m - 1, d, 12, 0, 0);
+      return new Date(t).toLocaleDateString('en-US', {
+        month: 'long', day: 'numeric', year: 'numeric',
+        timeZone: AMERICA_LOS_ANGELES,
+      });
+    }
+
+    /** Program assignment YYYY-MM-DD → short “Jan 5” (pure calendar, same everywhere). */
+    function formatAssignYmdShort(ymd) {
+      if (!ymd || typeof ymd !== 'string') return '';
+      const parts = ymd.split('-').map(Number);
+      if (parts.length !== 3) return '';
+      const m = parts[1];
+      const d = parts[2];
+      if (m < 1 || m > 12) return '';
+      return `${MONTH_SHORT[m - 1]} ${d}`;
+    }
+
+    function formatIsoDateLongLA(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return '—';
+      return d.toLocaleDateString('en-US', {
+        month: 'long', day: 'numeric', year: 'numeric',
+        timeZone: AMERICA_LOS_ANGELES,
+      });
+    }
+
+    function formatIsoDateShortLA(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return '—';
+      return d.toLocaleDateString('en-US', {
+        month: 'short', day: 'numeric',
+        timeZone: AMERICA_LOS_ANGELES,
+      });
+    }
+
+    function showToast(message, variant = 'info') {
+      let host = document.getElementById('toast-host');
+      if (!host) {
+        host = document.createElement('div');
+        host.id = 'toast-host';
+        host.className = 'toast-host';
+        host.setAttribute('aria-live', 'polite');
+        document.body.appendChild(host);
+      }
+      const t = document.createElement('div');
+      t.className = 'toast toast--' + variant;
+      t.textContent = message;
+      host.appendChild(t);
+      requestAnimationFrame(() => t.classList.add('toast--show'));
+      window.setTimeout(() => {
+        t.classList.remove('toast--show');
+        window.setTimeout(() => t.remove(), 340);
+      }, 3200);
+    }
+
+    let legacyPendingSyncMigrated = false;
+
+    function readSyncQueueRaw() {
+      try {
+        const raw = localStorage.getItem(SYNC_QUEUE_KEY);
+        const a = raw ? JSON.parse(raw) : [];
+        return Array.isArray(a) ? a : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function writeSyncQueueRaw(arr) {
+      if (!arr.length) localStorage.removeItem(SYNC_QUEUE_KEY);
+      else localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(arr));
+    }
+
+    function migrateLegacyPendingSyncOnce() {
+      if (legacyPendingSyncMigrated) return;
+      legacyPendingSyncMigrated = true;
+      try {
+        const legacyRaw = localStorage.getItem(LEGACY_PENDING_SYNC_KEY);
+        if (!legacyRaw) return;
+        localStorage.removeItem(LEGACY_PENDING_SYNC_KEY);
+        const legacy = JSON.parse(legacyRaw);
+        if (!Array.isArray(legacy) || legacy.length === 0) return;
+        const ops = [];
+        for (const o of legacy) {
+          if (o && o.table === 'exercise_logs' && o.data && typeof o.data === 'object') {
+            const payload = { ...o.data };
+            if (!payload.id) payload.id = newLogId();
+            ops.push({ kind: 'exercise_logs_upsert', payload });
+          }
+        }
+        if (ops.length) writeSyncQueueRaw(ops.concat(readSyncQueueRaw()));
+      } catch (e) {
+        console.warn('migrateLegacyPendingSyncOnce', e);
+      }
+    }
+
+    function readSyncQueue() {
+      migrateLegacyPendingSyncOnce();
+      return readSyncQueueRaw();
+    }
+
+    function syncQueueLength() {
+      return readSyncQueue().length;
+    }
+
+    function enqueueSyncOp(op) {
+      const q = readSyncQueue();
+      q.push(op);
+      writeSyncQueueRaw(q);
+      updateSyncStatusUI();
+    }
+
+    function dequeueOpsForLogId(logId) {
+      if (!logId) return;
+      const q = readSyncQueue().filter(op => {
+        if (op.kind === 'exercise_logs_upsert' && op.payload && op.payload.id === logId) return false;
+        if (op.kind === 'exercise_logs_update' && op.id === logId) return false;
+        if (op.kind === 'exercise_logs_delete' && op.id === logId) return false;
+        return true;
+      });
+      writeSyncQueueRaw(q);
+      updateSyncStatusUI();
+    }
+
+    function shouldQueueForSync(err) {
+      if (!navigator.onLine) return true;
+      const msg = err ? (err.message || String(err)) : '';
+      if (/failed to fetch|networkerror|network request failed|load failed|timeout/i.test(msg)) return true;
+      return false;
+    }
+
+    function updateSyncStatusUI() {
+      const el = document.getElementById('settings-sync-status');
+      if (!el) return;
+      const n = syncQueueLength();
+      el.classList.remove('sync-status-synced', 'sync-status-pending', 'sync-status-offline');
+      if (!navigator.onLine) {
+        el.textContent = 'Offline';
+        el.classList.add('sync-status-offline');
+      } else if (n > 0) {
+        el.textContent = 'Pending sync (' + n + ')';
+        el.classList.add('sync-status-pending');
+      } else {
+        el.textContent = 'Synced';
+        el.classList.add('sync-status-synced');
+      }
+    }
+
+    async function applyOneSyncOp(op) {
+      if (op.kind === 'exercise_logs_upsert') {
+        const { error } = await supabaseClient.from('exercise_logs').upsert(op.payload, { onConflict: 'id' });
+        if (error) throw error;
+      } else if (op.kind === 'exercise_logs_update') {
+        const { error } = await supabaseClient.from('exercise_logs').update(op.patch).eq('id', op.id);
+        if (error) throw error;
+      } else if (op.kind === 'exercise_logs_delete') {
+        const { error } = await supabaseClient.from('exercise_logs').delete().eq('id', op.id);
+        if (error) throw error;
+      }
+    }
+
+    async function flushSyncQueue() {
+      if (!currentUser || !navigator.onLine) {
+        updateSyncStatusUI();
+        return;
+      }
+      const q = readSyncQueue();
+      let i = 0;
+      for (; i < q.length; i++) {
+        try {
+          await applyOneSyncOp(q[i]);
+        } catch (e) {
+          console.warn('flushSyncQueue paused', e);
+          break;
+        }
+      }
+      writeSyncQueueRaw(q.slice(i));
+      updateSyncStatusUI();
+    }
+
+    function validateImportPayload(data) {
+      const errors = [];
+      if (!data || typeof data !== 'object') {
+        errors.push('File must be a JSON object.');
+        return errors;
+      }
+      if (data.user_program_state != null && typeof data.user_program_state !== 'object') {
+        errors.push('user_program_state must be an object.');
+      } else if (data.user_program_state) {
+        const st = data.user_program_state;
+        const d = st.current_program_day;
+        if (d != null && (!Number.isInteger(d) || d < 1 || d > 91)) {
+          errors.push('current_program_day must be an integer from 1 to 91.');
+        }
+        if (st.start_date != null && !/^\d{4}-\d{2}-\d{2}$/.test(st.start_date)) {
+          errors.push('start_date must look like YYYY-MM-DD.');
+        }
+      }
+      if (data.workout_sessions != null) {
+        if (!Array.isArray(data.workout_sessions)) errors.push('workout_sessions must be an array.');
+        else {
+          data.workout_sessions.forEach((s, i) => {
+            if (!s || typeof s !== 'object') {
+              errors.push('workout_sessions[' + i + '] must be an object.');
+              return;
+            }
+            if (s.program_day != null && (!Number.isInteger(s.program_day) || s.program_day < 1 || s.program_day > 91)) {
+              errors.push('workout_sessions[' + i + '].program_day must be an integer from 1 to 91.');
+            }
+            if (s.id != null && typeof s.id !== 'string') {
+              errors.push('workout_sessions[' + i + '].id must be a string (UUID).');
+            }
+          });
+        }
+      }
+      const sessionIds = data.workout_sessions && Array.isArray(data.workout_sessions)
+        ? new Set(data.workout_sessions.map(s => s && s.id).filter(Boolean))
+        : null;
+      if (data.exercise_logs != null) {
+        if (!Array.isArray(data.exercise_logs)) errors.push('exercise_logs must be an array.');
+        else {
+          data.exercise_logs.forEach((l, i) => {
+            if (!l || typeof l !== 'object') {
+              errors.push('exercise_logs[' + i + '] must be an object.');
+              return;
+            }
+            if (!l.session_id) errors.push('exercise_logs[' + i + '] is missing session_id.');
+            if (l.exercise_order == null || typeof l.exercise_order !== 'number') {
+              errors.push('exercise_logs[' + i + '].exercise_order must be a number.');
+            }
+            if (l.set_number == null || typeof l.set_number !== 'number') {
+              errors.push('exercise_logs[' + i + '].set_number must be a number.');
+            }
+            if (sessionIds && sessionIds.size && l.session_id && !sessionIds.has(l.session_id)) {
+              errors.push('exercise_logs[' + i + '].session_id does not match any workout_sessions.id in this file.');
+            }
+          });
+        }
+      }
+      if (data.rest_day_activities != null) {
+        if (!Array.isArray(data.rest_day_activities)) errors.push('rest_day_activities must be an array.');
+        else {
+          data.rest_day_activities.forEach((r, i) => {
+            if (!r || typeof r !== 'object') {
+              errors.push('rest_day_activities[' + i + '] must be an object.');
+              return;
+            }
+            if (r.program_day != null && (!Number.isInteger(r.program_day) || r.program_day < 1 || r.program_day > 91)) {
+              errors.push('rest_day_activities[' + i + '].program_day must be an integer from 1 to 91.');
+            }
+          });
+        }
+      }
+      return errors;
+    }
+
+    function todayYmdPST() {
+      return new Date().toLocaleDateString('en-CA', { timeZone: AMERICA_LOS_ANGELES });
+    }
+
+    function addCalendarDaysToYmd(ymd, delta) {
+      const [Y, M, D] = ymd.split('-').map(Number);
+      const t = Date.UTC(Y, M - 1, D + delta);
+      const dt = new Date(t);
+      const y = dt.getUTCFullYear();
+      const mo = String(dt.getUTCMonth() + 1).padStart(2, '0');
+      const da = String(dt.getUTCDate()).padStart(2, '0');
+      return `${y}-${mo}-${da}`;
+    }
+
+    function programDayAssignYmd(programDay) {
+      if (!programState || !programState.start_date) return todayYmdPST();
+      return addCalendarDaysToYmd(programState.start_date, programDay - 1);
+    }
+
+    async function advanceProgramDayInDbOnly() {
+      if (!programState || !currentUser) return;
+      const nextDay = Math.min(programState.current_program_day + 1, 91);
+      await supabaseClient
+        .from('user_program_state')
+        .update({ current_program_day: nextDay, updated_at: new Date().toISOString() })
+        .eq('user_id', currentUser.id);
+      programState.current_program_day = nextDay;
+    }
+
+    /** After midnight PST, advance to next program day if today’s assignment is fully logged. */
+    async function maybeAdvanceProgramDayAfterPstRoll() {
+      if (!programState || !currentUser) return;
+      for (let i = 0; i < 96; i++) {
+        const pd = programState.current_program_day;
+        const { data: done } = await supabaseClient
+          .from('workout_sessions')
+          .select('id')
+          .eq('user_id', currentUser.id)
+          .eq('program_day', pd)
+          .not('completed_at', 'is', null)
+          .limit(1)
+          .maybeSingle();
+        if (!done) break;
+        const assignYmd = programDayAssignYmd(pd);
+        const pstYmd = todayYmdPST();
+        if (assignYmd >= pstYmd) break;
+        await advanceProgramDayInDbOnly();
+      }
+    }
 
     async function loadDashboard() {
       if (!currentUser) return;
@@ -2010,8 +3307,8 @@
       let state = stateRows && stateRows.length > 0 ? stateRows[0] : null;
 
       if (!state) {
-        // First time — create with today as start
-        const today = new Date().toISOString().split('T')[0];
+        // First time — create with today as start (calendar day in Pacific)
+        const today = todayYmdPST();
         const { data: newRows, error: insertErr } = await supabaseClient
           .from('user_program_state')
           .insert({ user_id: currentUser.id, current_program_day: 1, start_date: today })
@@ -2022,8 +3319,35 @@
       }
 
       programState = state;
-      todayEntry = PROGRAM.schedule.find(d => d.programDay === state.current_program_day);
+      await maybeAdvanceProgramDayAfterPstRoll();
+      todayEntry = PROGRAM.schedule.find(d => d.programDay === programState.current_program_day);
       if (!todayEntry) todayEntry = PROGRAM.schedule[PROGRAM.schedule.length - 1];
+
+      const { data: dashCompletedSession } = await supabaseClient
+        .from('workout_sessions')
+        .select('id, workout_type, completed_at')
+        .eq('user_id', currentUser.id)
+        .eq('program_day', programState.current_program_day)
+        .not('completed_at', 'is', null)
+        .limit(1)
+        .maybeSingle();
+
+      const dashDayComplete = !!dashCompletedSession;
+      let dashOpenSessionId = null;
+      if (!dashDayComplete && todayEntry.type !== 'rest') {
+        const { data: openRow } = await supabaseClient
+          .from('workout_sessions')
+          .select('id')
+          .eq('user_id', currentUser.id)
+          .eq('program_day', programState.current_program_day)
+          .is('completed_at', null)
+          .order('id', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        dashOpenSessionId = openRow && openRow.id ? openRow.id : null;
+      }
+      const workoutEventEl = document.getElementById('dash-workout-event');
+      workoutEventEl.classList.toggle('workout-event--completed', dashDayComplete);
 
       // Phase title
       document.getElementById('dash-phase-week').textContent = `Week ${todayEntry.week}, Day ${todayEntry.day}`;
@@ -2038,29 +3362,75 @@
       animateGauge('dash-gauge-week', weekNum);
       animateGauge('dash-gauge-left', leftCount);
 
-      // Today's workout card
+      // Today's workout card (date shown in PST — matches program-day roll at midnight PST)
       const now = new Date();
-      const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-      document.getElementById('dash-event-day').textContent = days[now.getDay()];
-      document.getElementById('dash-event-date').textContent = `${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+      document.getElementById('dash-event-day').textContent = now.toLocaleDateString('en-US', { weekday: 'long', timeZone: AMERICA_LOS_ANGELES });
+      document.getElementById('dash-event-date').textContent = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: AMERICA_LOS_ANGELES });
+
+      const dashDetails = document.getElementById('dash-event-details');
+      const dashChips = document.getElementById('dash-rest-activity-chips');
+      const skipRest = document.getElementById('btn-skip-rest-day');
+      const dashWorkoutLabel = document.getElementById('dash-workout-label');
+      const startBtn = document.getElementById('btn-start-workout');
 
       if (todayEntry.type === 'rest') {
         document.getElementById('dash-workout-name').textContent = 'Rest Day';
-        document.getElementById('dash-workout-focus').textContent = 'Active Recovery';
-        document.getElementById('dash-exercises-count').textContent = '0';
-        document.getElementById('btn-start-workout').textContent = 'Skip to Next';
-        document.getElementById('btn-start-workout').onclick = advanceDay;
+        if (dashDayComplete) {
+          dashWorkoutLabel.textContent = 'Rest day';
+          document.getElementById('dash-workout-focus').textContent = 'Logged for today — great recovery work.';
+          dashDetails.style.display = 'none';
+          dashChips.style.display = 'none';
+          dashChips.innerHTML = '';
+          skipRest.style.display = 'none';
+          startBtn.classList.remove('btn-primary');
+          startBtn.classList.add('btn-secondary');
+          startBtn.disabled = true;
+          startBtn.textContent = 'Rest day complete';
+        } else {
+          dashWorkoutLabel.textContent = 'Today\'s Workout';
+          document.getElementById('dash-workout-focus').textContent = 'Active Recovery';
+          dashDetails.style.display = 'none';
+          dashChips.style.display = 'flex';
+          skipRest.style.display = 'block';
+          startBtn.classList.remove('btn-secondary');
+          startBtn.classList.add('btn-primary');
+          startBtn.disabled = false;
+          startBtn.textContent = 'Add Activity for the Day';
+          await renderDashRestChips(programState.current_program_day);
+        }
       } else {
+        dashDetails.style.display = 'flex';
+        dashChips.style.display = 'none';
+        dashChips.innerHTML = '';
+        skipRest.style.display = 'none';
         document.getElementById('dash-workout-name').textContent = todayEntry.workoutName;
-        document.getElementById('dash-workout-focus').textContent = todayEntry.focus;
-        document.getElementById('dash-exercises-count').textContent = todayEntry.exercises.length;
-        document.getElementById('btn-start-workout').textContent = 'Start Workout';
-        document.getElementById('btn-start-workout').onclick = startWorkout;
+        if (dashDayComplete) {
+          dashWorkoutLabel.textContent = 'Workout complete';
+          document.getElementById('dash-workout-focus').textContent = 'You\'re done for today. Next session unlocks after midnight PT.';
+          document.getElementById('dash-exercises-count').textContent = todayEntry.exercises.length;
+          startBtn.classList.remove('btn-primary');
+          startBtn.classList.add('btn-secondary');
+          startBtn.disabled = true;
+          startBtn.textContent = 'Completed';
+        } else {
+          dashWorkoutLabel.textContent = 'Today\'s Workout';
+          document.getElementById('dash-workout-focus').textContent = todayEntry.focus;
+          document.getElementById('dash-exercises-count').textContent = todayEntry.exercises.length;
+          startBtn.classList.remove('btn-secondary');
+          startBtn.classList.add('btn-primary');
+          startBtn.disabled = false;
+          startBtn.textContent = dashOpenSessionId ? 'Continue workout' : 'Start Workout';
+        }
       }
 
-      // Last session for this workout type
-      await loadLastSession(todayEntry.workoutType);
+      if (!dashDayComplete && todayEntry.type !== 'rest') {
+        await loadLastSession(todayEntry.workoutType);
+      } else {
+        document.getElementById('dash-last-session').style.display = 'none';
+      }
+
+      updateSyncStatusUI();
+      flushSyncQueue().catch(() => {});
     }
 
     async function getCompletedCount() {
@@ -2068,7 +3438,8 @@
         .from('workout_sessions')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', currentUser.id)
-        .not('completed_at', 'is', null);
+        .not('completed_at', 'is', null)
+        .or('workout_type.is.null,workout_type.neq.rest');
       return count || 0;
     }
 
@@ -2121,10 +3492,8 @@
       }
 
       panel.style.display = '';
-      const completedDate = new Date(session.completed_at);
-      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
       document.getElementById('dash-last-title').textContent = `Last ${todayEntry.workoutName}`;
-      document.getElementById('dash-last-date').textContent = `${monthNames[completedDate.getMonth()]} ${completedDate.getDate()}`;
+      document.getElementById('dash-last-date').textContent = formatIsoDateShortLA(session.completed_at);
 
       // Rebuild rows
       const header = panel.querySelector('.last-session-header');
@@ -2153,72 +3522,341 @@
       requestAnimationFrame(tick);
     }
 
-    async function advanceDay() {
-      if (!programState) return;
-      const nextDay = Math.min(programState.current_program_day + 1, 91);
-      await supabaseClient
-        .from('user_program_state')
-        .update({ current_program_day: nextDay, updated_at: new Date().toISOString() })
-        .eq('user_id', currentUser.id);
+    async function completeRestDay() {
+      if (!programState || !currentUser || !todayEntry || todayEntry.type !== 'rest') return;
+      const now = new Date().toISOString();
+      const { error } = await supabaseClient.from('workout_sessions').insert({
+        user_id: currentUser.id,
+        workout_type: 'rest',
+        week: todayEntry.week,
+        day: todayEntry.day,
+        program_day: todayEntry.programDay,
+        phase: todayEntry.phase,
+        completed_at: now,
+      });
+      if (error) {
+        console.error('completeRestDay', error);
+        showToast('Could not save rest day. Try again.', 'error');
+        return;
+      }
       await loadDashboard();
     }
 
     let currentSessionId = null;
+    let workoutCompletionInFlight = false;
+    let startWorkoutInFlight = false;
+    let pendingScheduleCelebration = null;
 
-    async function startWorkout() {
-      if (!todayEntry || todayEntry.type === 'rest') return;
+    const waitMs = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-      // Create workout session
-      const { data: session } = await supabaseClient
-        .from('workout_sessions')
-        .insert({
-          user_id: currentUser.id,
-          workout_type: todayEntry.workoutType,
-          week: todayEntry.week,
-          day: todayEntry.day,
-          program_day: todayEntry.programDay,
-          phase: todayEntry.phase,
-        })
-        .select()
-        .single();
-
-      currentSessionId = session.id;
-      loadExerciseLogging();
-      showScreen('logging');
+    function formatSessionVolume(n) {
+      if (!Number.isFinite(n)) return '0';
+      return Math.round(n).toLocaleString();
     }
 
-    document.getElementById('btn-start-workout').addEventListener('click', startWorkout);
+    function computeSessionVolumeFromSetData() {
+      let total = 0;
+      if (!exerciseList || !setData) return 0;
+      exerciseList.forEach((ex, i) => {
+        const sets = setData[i];
+        if (!sets) return;
+        for (let s = 1; s <= ex.sets; s++) {
+          const row = sets[s];
+          if (!row || !row.done) continue;
+          const w = parseFloat(String(row.weight || '').trim().replace(',', '.'), 10);
+          const r = parseInt(String(row.reps || '').trim(), 10);
+          if (Number.isFinite(w) && Number.isFinite(r) && r > 0) total += w * r;
+        }
+      });
+      return Math.round(total);
+    }
+
+    async function maybeRunScheduleCelebration() {
+      const pending = pendingScheduleCelebration;
+      if (!pending) return;
+      pendingScheduleCelebration = null;
+
+      const row = document.querySelector(`#schedule-list .day-row[data-program-day="${pending.programDay}"]`);
+      if (!row) {
+        showScreen('dashboard');
+        return;
+      }
+
+      const inner = row.querySelector('.day-row-flip-inner');
+      const volEl = row.querySelector('.day-back-volume');
+      const onwardBtn = row.querySelector('.btn-onward');
+      if (!inner || !volEl || !onwardBtn) {
+        showScreen('dashboard');
+        return;
+      }
+
+      volEl.textContent = formatSessionVolume(pending.volume);
+      onwardBtn.hidden = false;
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      row.classList.add('day-row--celebration-lock');
+      row.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+
+      if (reduceMotion) {
+        inner.classList.add('is-flipped');
+        onwardBtn.addEventListener('click', () => finishScheduleCelebration(row, inner, onwardBtn), { once: true });
+        return;
+      }
+
+      await waitMs(280);
+      row.classList.add('day-row--stamp');
+      await waitMs(560);
+      row.classList.remove('day-row--stamp');
+      await waitMs(120);
+      inner.classList.add('is-flipped');
+
+      onwardBtn.addEventListener('click', () => finishScheduleCelebration(row, inner, onwardBtn), { once: true });
+    }
+
+    function finishScheduleCelebration(row, inner, onwardBtn) {
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (onwardBtn) onwardBtn.hidden = true;
+      inner.classList.remove('is-flipped');
+      row.classList.remove('day-row--celebration-lock');
+      const delay = reduceMotion ? 80 : 720;
+      window.setTimeout(() => {
+        showScreen('dashboard');
+      }, delay);
+    }
+
+    async function startWorkout() {
+      if (!todayEntry || todayEntry.type === 'rest' || !currentUser) return;
+      if (startWorkoutInFlight) return;
+      startWorkoutInFlight = true;
+      try {
+        const { data: doneAlready } = await supabaseClient
+          .from('workout_sessions')
+          .select('id')
+          .eq('user_id', currentUser.id)
+          .eq('program_day', todayEntry.programDay)
+          .not('completed_at', 'is', null)
+          .limit(1)
+          .maybeSingle();
+        if (doneAlready) {
+          showToast('This workout is already completed. The next session unlocks after midnight Pacific.', 'info');
+          return;
+        }
+
+        const { data: openRow } = await supabaseClient
+          .from('workout_sessions')
+          .select('id')
+          .eq('user_id', currentUser.id)
+          .eq('program_day', todayEntry.programDay)
+          .is('completed_at', null)
+          .order('id', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (openRow && openRow.id) {
+          currentSessionId = openRow.id;
+          exerciseNotes = {};
+          await loadExerciseLogging();
+          showScreen('logging');
+          return;
+        }
+
+        const { data: session, error } = await supabaseClient
+          .from('workout_sessions')
+          .insert({
+            user_id: currentUser.id,
+            workout_type: todayEntry.workoutType,
+            week: todayEntry.week,
+            day: todayEntry.day,
+            program_day: todayEntry.programDay,
+            phase: todayEntry.phase,
+          })
+          .select()
+          .single();
+
+        if (error) {
+          console.error('startWorkout', error);
+          showToast(
+            shouldQueueForSync(error)
+              ? 'You seem offline. Connect to the internet to start a new workout.'
+              : 'Could not start workout. Try again.',
+            'error',
+          );
+          return;
+        }
+
+        currentSessionId = session.id;
+        exerciseNotes = {};
+        await loadExerciseLogging();
+        showScreen('logging');
+      } finally {
+        startWorkoutInFlight = false;
+      }
+    }
+
+    document.getElementById('btn-start-workout').addEventListener('click', () => {
+      if (!todayEntry) return;
+      if (todayEntry.type === 'rest') openRestActivityModal();
+      else startWorkout();
+    });
+
+    document.getElementById('btn-skip-rest-day').addEventListener('click', () => completeRestDay());
+    document.getElementById('btn-rest-modal-close').addEventListener('click', closeRestActivityModal);
+    document.getElementById('modal-rest-activities').addEventListener('click', (e) => {
+      if (e.target.id === 'modal-rest-activities') closeRestActivityModal();
+    });
+    document.getElementById('btn-session-review-back').addEventListener('click', () => {
+      showScreen('schedule', false);
+    });
 
     // ── Exercise Logging ──────────────────────────────────────────
     let currentExerciseIndex = 0;
-    let exerciseList = [];        // exercises for current workout
-    let setData = {};             // { exerciseIndex: { setNum: { weight, reps, done } } }
-    let prevSessionData = {};     // { exerciseName: [{ set_number, weight, reps }] }
+    let exerciseList = [];
+    let setData = {};
+    let exerciseNotes = {};
+    let prevSessionData = {};
     let timerInterval = null;
     let timerSeconds = 0;
+    let notePersistTimer = null;
+
+    function normStr(v) {
+      if (v === null || v === undefined) return '';
+      return String(v);
+    }
+
+    function mergeSetDataFromLocal(parsed) {
+      Object.keys(parsed).forEach(k => {
+        const idx = parseInt(k, 10);
+        if (Number.isNaN(idx) || !setData[idx]) return;
+        const from = parsed[k];
+        if (!from || typeof from !== 'object') return;
+        Object.keys(from).forEach(sk => {
+          const sn = parseInt(sk, 10);
+          if (!setData[idx][sn]) return;
+          setData[idx][sn] = { ...setData[idx][sn], ...from[sn] };
+        });
+      });
+    }
+
+    function loadSessionLocalPayload() {
+      if (!currentSessionId) return;
+      const raw = localStorage.getItem(`session_${currentSessionId}`);
+      if (!raw) return;
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && parsed.setData) {
+          mergeSetDataFromLocal(parsed.setData);
+          if (parsed.exerciseNotes) Object.assign(exerciseNotes, parsed.exerciseNotes);
+        } else if (parsed && typeof parsed === 'object') {
+          mergeSetDataFromLocal(parsed);
+        }
+      } catch (e) {}
+    }
+
+    function saveSessionLocalPayload() {
+      if (!currentSessionId) return;
+      localStorage.setItem(`session_${currentSessionId}`, JSON.stringify({ setData, exerciseNotes }));
+    }
+
+    function scheduleNotePersist() {
+      clearTimeout(notePersistTimer);
+      notePersistTimer = setTimeout(persistExerciseNotesToSession, 450);
+    }
+
+    async function persistExerciseNotesToSession() {
+      if (!currentSessionId || !currentUser) return;
+      const { data: row, error: re } = await supabaseClient
+        .from('workout_sessions')
+        .select('exercise_notes')
+        .eq('id', currentSessionId)
+        .single();
+      if (re) return;
+      const prev = row && row.exercise_notes && typeof row.exercise_notes === 'object' ? { ...row.exercise_notes } : {};
+      exerciseList.forEach((_, i) => {
+        const t = (exerciseNotes[i] || '').trim();
+        const k = String(i + 1);
+        if (t) prev[k] = t;
+        else delete prev[k];
+      });
+      const { error } = await supabaseClient
+        .from('workout_sessions')
+        .update({ exercise_notes: prev })
+        .eq('id', currentSessionId);
+      if (error) console.warn('exercise_notes update', error);
+    }
+
+    function refreshSetActionButton(btn, sd, weightInput, repsInput) {
+      const w = weightInput.value.trim();
+      const r = repsInput.value.trim();
+      const dirty = sd.done && (w !== normStr(sd.savedWeight) || r !== normStr(sd.savedReps));
+      btn.classList.remove('checked', 'save-mode');
+      if (!sd.done) {
+        btn.textContent = '✓';
+      } else if (dirty) {
+        btn.textContent = 'SAVE';
+        btn.classList.add('save-mode');
+      } else {
+        btn.textContent = '✓';
+        btn.classList.add('checked');
+      }
+    }
 
     async function loadExerciseLogging() {
       if (!todayEntry || !currentSessionId) return;
       exerciseList = todayEntry.exercises;
       currentExerciseIndex = 0;
       setData = {};
+      exerciseNotes = {};
 
-      // Init setData for all exercises
       exerciseList.forEach((ex, i) => {
         setData[i] = {};
         for (let s = 1; s <= ex.sets; s++) {
-          setData[i][s] = { weight: '', reps: '', done: false };
+          setData[i][s] = {
+            weight: '',
+            reps: '',
+            done: false,
+            logId: null,
+            savedWeight: null,
+            savedReps: null,
+          };
         }
       });
 
-      // Load from localStorage (offline buffer)
-      const localKey = `session_${currentSessionId}`;
-      const saved = localStorage.getItem(localKey);
-      if (saved) {
-        try { Object.assign(setData, JSON.parse(saved)); } catch(e) {}
+      const { data: existingLogs } = await supabaseClient
+        .from('exercise_logs')
+        .select('id, exercise_order, set_number, weight, reps')
+        .eq('session_id', currentSessionId)
+        .order('exercise_order')
+        .order('set_number');
+
+      (existingLogs || []).forEach(log => {
+        const ei = log.exercise_order - 1;
+        const sn = log.set_number;
+        if (!setData[ei] || !setData[ei][sn]) return;
+        setData[ei][sn] = {
+          weight: log.weight != null ? String(log.weight) : '',
+          reps: log.reps != null ? String(log.reps) : '',
+          done: true,
+          logId: log.id,
+          savedWeight: log.weight,
+          savedReps: log.reps,
+        };
+      });
+
+      const { data: sessRow, error: sne } = await supabaseClient
+        .from('workout_sessions')
+        .select('exercise_notes')
+        .eq('id', currentSessionId)
+        .single();
+
+      if (!sne && sessRow && sessRow.exercise_notes && typeof sessRow.exercise_notes === 'object') {
+        Object.entries(sessRow.exercise_notes).forEach(([k, v]) => {
+          const idx = parseInt(k, 10) - 1;
+          if (idx >= 0 && idx < exerciseList.length && typeof v === 'string') exerciseNotes[idx] = v;
+        });
       }
 
-      // Fetch previous session data for this workout type
+      loadSessionLocalPayload();
+
       prevSessionData = {};
       const { data: prevSessions } = await supabaseClient
         .from('workout_sessions')
@@ -2243,9 +3881,7 @@
         });
       }
 
-      // Set top bar
       document.getElementById('logging-title').textContent = todayEntry.workoutName;
-
       renderExercise();
     }
 
@@ -2254,10 +3890,8 @@
       if (!ex) return;
       const total = exerciseList.length;
 
-      // Top bar counter
       document.getElementById('logging-count').textContent = `${currentExerciseIndex + 1} / ${total}`;
 
-      // Progress bar + dots
       const completedExercises = exerciseList.filter((_, i) => isExerciseDone(i)).length;
       const pct = total > 0 ? (completedExercises / total) * 100 : 0;
       document.getElementById('logging-progress-fill').style.width = `${pct}%`;
@@ -2266,14 +3900,19 @@
       const dotsContainer = document.getElementById('logging-progress-dots');
       dotsContainer.innerHTML = '';
       exerciseList.forEach((_, i) => {
-        const dot = document.createElement('div');
+        const dot = document.createElement('button');
+        dot.type = 'button';
         dot.className = 'progress-dot';
+        dot.setAttribute('aria-label', `Exercise ${i + 1}`);
         if (isExerciseDone(i)) dot.classList.add('completed');
-        else if (i === currentExerciseIndex) dot.classList.add('current');
+        if (i === currentExerciseIndex) dot.classList.add('current');
+        dot.addEventListener('click', () => {
+          currentExerciseIndex = i;
+          renderExercise();
+        });
         dotsContainer.appendChild(dot);
       });
 
-      // Exercise card header
       document.getElementById('exercise-name').textContent = ex.name;
       document.getElementById('exercise-meta').innerHTML =
         `<span>${ex.sets} set${ex.sets > 1 ? 's' : ''}</span>` +
@@ -2288,11 +3927,9 @@
         noteEl.style.display = 'none';
       }
 
-      // Exercise card border state
       const card = document.getElementById('exercise-card');
-      card.classList.toggle('card-done', isExerciseDone(currentExerciseIndex));
+      card.classList.toggle('card-completed', isExerciseDone(currentExerciseIndex));
 
-      // Previous results
       const prevContainer = document.getElementById('exercise-prev-results');
       const prevData = prevSessionData[ex.name];
       if (prevData && prevData.length > 0) {
@@ -2310,137 +3947,265 @@
         prevContainer.style.display = 'none';
       }
 
-      // Set input rows
       const inputsContainer = document.getElementById('set-inputs');
       inputsContainer.innerHTML = '';
       const sets = setData[currentExerciseIndex];
 
       for (let s = 1; s <= ex.sets; s++) {
         const sd = sets[s];
-        const isDone = sd.done;
-        const isActive = !isDone && !Object.values(sets).slice(0, s - 1).some(prev => !prev.done) || (s === 1 && !isDone);
-        // Active = first undone set
         const firstUndone = Object.entries(sets).find(([_, v]) => !v.done);
-        const isActiveSet = firstUndone && parseInt(firstUndone[0]) === s;
+        const isActiveSet = firstUndone && parseInt(firstUndone[0], 10) === s;
 
         const row = document.createElement('div');
-        row.className = `set-input-row${isDone ? ' row-done' : ''}${isActiveSet ? ' row-active' : ''}`;
+        row.className = `set-input-row${sd.done ? ' row-done' : ''}${isActiveSet ? ' row-active' : ''}`;
         row.innerHTML = `
-          <div class="set-number${isDone ? ' done' : ''}">${s}</div>
-          <input class="input-set${sd.weight ? ' has-value' : ''}" value="${sd.weight}" ${isDone ? 'readonly' : ''} inputmode="numeric" placeholder="—" data-set="${s}" data-field="weight">
+          <div class="set-number${sd.done ? ' done' : ''}">${s}</div>
+          <input class="input-set${sd.weight ? ' has-value' : ''}" inputmode="decimal" placeholder="—" data-set="${s}" data-field="weight">
           <span class="field-unit">lbs</span>
           <span class="field-x">×</span>
-          <input class="input-set${sd.reps ? ' has-value' : ''}" value="${sd.reps}" ${isDone ? 'readonly' : ''} inputmode="numeric" placeholder="—" data-set="${s}" data-field="reps">
+          <input class="input-set${sd.reps ? ' has-value' : ''}" inputmode="numeric" placeholder="—" data-set="${s}" data-field="reps">
           <span class="field-unit">reps</span>
-          <button class="set-check${isDone ? ' checked' : ''}" data-set="${s}">✓</button>
-        `;
+          <button type="button" class="set-check" data-set="${s}">✓</button>`;
         inputsContainer.appendChild(row);
+
+        const wInput = row.querySelector('input[data-field="weight"]');
+        const rInput = row.querySelector('input[data-field="reps"]');
+        wInput.value = sd.weight || '';
+        rInput.value = sd.reps || '';
+        wInput.classList.toggle('has-value', !!wInput.value);
+        rInput.classList.toggle('has-value', !!rInput.value);
 
         const targetLabel = document.createElement('div');
         targetLabel.className = 'target-label';
         targetLabel.textContent = `Target: ${ex.repRanges[s - 1] || '—'} reps`;
         inputsContainer.appendChild(targetLabel);
 
-        // Event listeners for inputs
+        const checkBtn = row.querySelector('.set-check');
+        refreshSetActionButton(checkBtn, sd, wInput, rInput);
+
         row.querySelectorAll('input').forEach(input => {
           input.addEventListener('input', () => {
-            const setNum = parseInt(input.dataset.set);
+            const setNum = parseInt(input.dataset.set, 10);
             const field = input.dataset.field;
             sets[setNum][field] = input.value;
             input.classList.toggle('has-value', !!input.value);
-            saveSetDataLocally();
+            saveSessionLocalPayload();
+            refreshSetActionButton(checkBtn, sets[setNum], wInput, rInput);
           });
         });
 
-        // Check button
-        row.querySelector('.set-check').addEventListener('click', async function() {
-          const setNum = parseInt(this.dataset.set);
+        checkBtn.addEventListener('click', async () => {
+          const setNum = parseInt(checkBtn.dataset.set, 10);
           const weightInput = row.querySelector('input[data-field="weight"]');
           const repsInput = row.querySelector('input[data-field="reps"]');
+          const sdi = sets[setNum];
+          const wStr = weightInput.value.trim();
+          const rStr = repsInput.value.trim();
+          const weight = parseFloat(wStr);
+          const reps = parseInt(rStr, 10);
+          const dirty = sdi.done && (wStr !== normStr(sdi.savedWeight) || rStr !== normStr(sdi.savedReps));
 
-          if (sets[setNum].done) return; // already done
-
-          const weight = parseFloat(weightInput.value);
-          const reps = parseInt(repsInput.value);
-          if (!weight || !reps) return; // need both values
-
-          sets[setNum].done = true;
-          sets[setNum].weight = weight;
-          sets[setNum].reps = reps;
-          saveSetDataLocally();
-
-          // Save to Supabase
-          await supabaseClient.from('exercise_logs').insert({
-            session_id: currentSessionId,
-            user_id: currentUser.id,
-            exercise_name: ex.name,
-            exercise_order: currentExerciseIndex + 1,
-            set_number: setNum,
-            weight: weight,
-            reps: reps,
-            set_type: ex.setTypes[setNum - 1] || 'normal',
-          });
-
-          renderExercise();
-
-          // Check if whole workout is done
-          if (isWorkoutComplete()) {
-            await completeWorkout();
+          if (!sdi.done) {
+            if (!weight || !reps) return;
+            sdi.done = true;
+            sdi.weight = wStr;
+            sdi.reps = rStr;
+            const logId = newLogId();
+            const payload = {
+              id: logId,
+              session_id: currentSessionId,
+              user_id: currentUser.id,
+              exercise_name: ex.name,
+              exercise_order: currentExerciseIndex + 1,
+              set_number: setNum,
+              weight,
+              reps,
+              set_type: ex.setTypes[setNum - 1] || 'normal',
+            };
+            const { error } = await supabaseClient.from('exercise_logs').insert(payload);
+            if (error) {
+              if (shouldQueueForSync(error)) {
+                enqueueSyncOp({ kind: 'exercise_logs_upsert', payload });
+                sdi.logId = logId;
+                sdi.savedWeight = weight;
+                sdi.savedReps = reps;
+                showToast('Saved on this device — will sync when you\'re back online.', 'success');
+                saveSessionLocalPayload();
+                renderExercise();
+                return;
+              }
+              console.error(error);
+              sdi.done = false;
+              showToast('Could not save set. Try again.', 'error');
+              return;
+            }
+            sdi.logId = logId;
+            sdi.savedWeight = weight;
+            sdi.savedReps = reps;
+            saveSessionLocalPayload();
+            renderExercise();
+            return;
           }
+
+          if (dirty) {
+            if (!weight || !reps) return;
+            const { error } = await supabaseClient
+              .from('exercise_logs')
+              .update({ weight, reps })
+              .eq('id', sdi.logId);
+            if (error) {
+              if (shouldQueueForSync(error)) {
+                enqueueSyncOp({ kind: 'exercise_logs_update', id: sdi.logId, patch: { weight, reps } });
+                sdi.weight = wStr;
+                sdi.reps = rStr;
+                sdi.savedWeight = weight;
+                sdi.savedReps = reps;
+                showToast('Updated on this device — will sync when you\'re back online.', 'info');
+                saveSessionLocalPayload();
+                renderExercise();
+                return;
+              }
+              console.error(error);
+              showToast('Could not update set. Try again.', 'error');
+              return;
+            }
+            sdi.weight = wStr;
+            sdi.reps = rStr;
+            sdi.savedWeight = weight;
+            sdi.savedReps = reps;
+            saveSessionLocalPayload();
+            renderExercise();
+            return;
+          }
+
+          if (sdi.logId) {
+            dequeueOpsForLogId(sdi.logId);
+            const { error: delErr } = await supabaseClient.from('exercise_logs').delete().eq('id', sdi.logId);
+            if (delErr) {
+              if (shouldQueueForSync(delErr)) {
+                enqueueSyncOp({ kind: 'exercise_logs_delete', id: sdi.logId });
+                showToast('Removed on this device — will sync when you\'re back online.', 'info');
+              } else {
+                console.error(delErr);
+                showToast('Could not remove set. Try again.', 'error');
+                return;
+              }
+            }
+          }
+          sdi.done = false;
+          sdi.logId = null;
+          sdi.savedWeight = null;
+          sdi.savedReps = null;
+          saveSessionLocalPayload();
+          renderExercise();
         });
       }
 
-      // Rest timer at bottom of sets
+      const noteWrap = document.createElement('div');
+      noteWrap.className = 'exercise-note-field-wrap';
+      noteWrap.innerHTML = '<label class="exercise-note-label" for="exercise-note-input">Notes</label><textarea class="exercise-note-input" id="exercise-note-input" rows="2" autocomplete="off"></textarea>';
+      inputsContainer.appendChild(noteWrap);
+      const ta = noteWrap.querySelector('#exercise-note-input');
+      ta.value = exerciseNotes[currentExerciseIndex] || '';
+      function autoResizeNote() {
+        ta.style.height = 'auto';
+        ta.style.height = `${ta.scrollHeight}px`;
+      }
+      ta.addEventListener('input', () => {
+        autoResizeNote();
+        exerciseNotes[currentExerciseIndex] = ta.value;
+        saveSessionLocalPayload();
+        scheduleNotePersist();
+      });
+      autoResizeNote();
+
       const timerBar = document.createElement('div');
       timerBar.className = 'timer-bar';
       timerBar.id = 'rest-timer';
       timerBar.innerHTML = `
-        <button class="timer-action" id="timer-start">Start</button>
+        <button type="button" class="timer-action" id="timer-start">Start</button>
         <span class="timer-value" id="timer-display">3:00</span>
-        <button class="timer-action" id="timer-reset">Reset</button>
-      `;
+        <button type="button" class="timer-action" id="timer-reset">Reset</button>`;
       inputsContainer.appendChild(timerBar);
 
-      // Timer event listeners
       document.getElementById('timer-start').addEventListener('click', startTimer);
       document.getElementById('timer-reset').addEventListener('click', resetTimer);
 
-      // Nav buttons
       document.getElementById('btn-prev-exercise').style.visibility = currentExerciseIndex > 0 ? 'visible' : 'hidden';
-      document.getElementById('btn-next-exercise').textContent = currentExerciseIndex < total - 1 ? 'Next →' : 'Done';
+
+      const completeWrap = document.getElementById('exercise-complete-wrap');
+      const nextBtn = document.getElementById('btn-next-exercise');
+      const isLastExercise = currentExerciseIndex === total - 1;
+      const lastExerciseFullyLogged = isLastExercise && isExerciseDone(currentExerciseIndex);
+
+      if (lastExerciseFullyLogged) {
+        completeWrap.hidden = false;
+        nextBtn.style.display = 'none';
+      } else {
+        completeWrap.hidden = true;
+        nextBtn.style.display = '';
+        nextBtn.textContent = currentExerciseIndex < total - 1 ? 'Next →' : 'Done';
+      }
     }
 
     function isExerciseDone(idx) {
       const sets = setData[idx];
-      if (!sets) return false;
-      return Object.values(sets).every(s => s.done);
+      const ex = exerciseList[idx];
+      if (!sets || !ex) return false;
+      for (let s = 1; s <= ex.sets; s++) {
+        if (!sets[s] || !sets[s].done) return false;
+      }
+      return true;
     }
 
     function isWorkoutComplete() {
       return exerciseList.every((_, i) => isExerciseDone(i));
     }
 
-    function saveSetDataLocally() {
-      if (!currentSessionId) return;
-      localStorage.setItem(`session_${currentSessionId}`, JSON.stringify(setData));
-    }
-
     async function completeWorkout() {
-      // Mark session complete
-      await supabaseClient
-        .from('workout_sessions')
-        .update({ completed_at: new Date().toISOString() })
-        .eq('id', currentSessionId);
+      if (workoutCompletionInFlight) return;
+      if (!currentSessionId || !isWorkoutComplete()) return;
 
-      // Advance program day
-      await advanceDay();
+      workoutCompletionInFlight = true;
+      const completeBtn = document.getElementById('btn-complete-workout');
+      if (completeBtn) completeBtn.disabled = true;
 
-      // Clean up local storage
-      localStorage.removeItem(`session_${currentSessionId}`);
-      currentSessionId = null;
+      const finishedProgramDay = programState ? programState.current_program_day : null;
+      const sessionVolume = computeSessionVolumeFromSetData();
 
-      showScreen('dashboard');
-      loadDashboard();
+      try {
+        clearTimeout(notePersistTimer);
+        notePersistTimer = null;
+        await persistExerciseNotesToSession();
+        await flushSyncQueue();
+        if (syncQueueLength() > 0) {
+          showToast('Some sets could not sync yet. Check your connection, wait for Data sync to show Synced, then finish the workout.', 'error');
+          return;
+        }
+
+        const { error: updErr } = await supabaseClient
+          .from('workout_sessions')
+          .update({ completed_at: new Date().toISOString() })
+          .eq('id', currentSessionId);
+
+        if (updErr) {
+          console.error(updErr);
+          showToast('Could not save workout completion. Check your connection and try again.', 'error');
+          return;
+        }
+
+        const sid = currentSessionId;
+        localStorage.removeItem(`session_${sid}`);
+        currentSessionId = null;
+
+        if (finishedProgramDay != null) {
+          pendingScheduleCelebration = { programDay: finishedProgramDay, volume: sessionVolume };
+        }
+        showScreen('schedule', true);
+      } finally {
+        workoutCompletionInFlight = false;
+        if (completeBtn) completeBtn.disabled = false;
+      }
     }
 
     // Timer
@@ -2490,54 +4255,149 @@
       if (currentExerciseIndex < exerciseList.length - 1) {
         currentExerciseIndex++;
         renderExercise();
-      } else if (isWorkoutComplete()) {
-        completeWorkout();
       }
     });
 
+    document.getElementById('btn-complete-workout').addEventListener('click', () => {
+      completeWorkout();
+    });
+
+    async function openRestDayReview(programDay, session) {
+      if (!currentUser || !programState) return;
+      sessionReviewSessionId = session && session.id ? session.id : null;
+      showScreen('sessionReview', false);
+      const listEl = document.getElementById('session-review-content');
+      listEl.innerHTML = '<div class="session-review-heading">Loading…</div>';
+      document.getElementById('session-review-title').textContent = 'Rest Day';
+
+      const sched = PROGRAM.schedule.find(d => d.programDay === programDay);
+      const week = session && session.week != null ? session.week : (sched ? sched.week : '—');
+      const day = session && session.day != null ? session.day : (sched ? sched.day : '—');
+      const completedIso = session && session.completed_at ? session.completed_at : null;
+      const headLine = completedIso
+        ? `Week ${week} · Day ${day} · ${formatIsoDateLongLA(completedIso)}`
+        : `Week ${week} · Day ${day}`;
+
+      const { data: acts, error: ae } = await supabaseClient
+        .from('rest_day_activities')
+        .select('activity_type, minutes')
+        .eq('user_id', currentUser.id)
+        .eq('program_day', programDay);
+
+      if (ae) {
+        listEl.innerHTML = '<div class="session-review-heading">Could not load activities.</div>';
+        console.error(ae);
+        return;
+      }
+
+      const withMins = (acts || [])
+        .filter(a => a.minutes > 0)
+        .sort((a, b) => (a.activity_type || '').localeCompare(b.activity_type || ''));
+
+      let inner = '';
+      if (withMins.length === 0) {
+        inner = '<div class="session-review-setline rest-summary-empty">No activities were logged for this rest day.</div>';
+      } else {
+        inner = withMins.map(a => {
+          const def = REST_ACTIVITY_TYPES.find(t => t.id === a.activity_type);
+          const label = def ? def.label : a.activity_type;
+          const icon = def ? def.svg : '';
+          return `<div class="rest-summary-row"><span class="rest-summary-icon">${icon}</span><span class="rest-summary-label">${label}</span><span class="rest-summary-mins">${a.minutes} min</span></div>`;
+        }).join('');
+      }
+
+      listEl.innerHTML = `
+        <div class="session-review-heading">${headLine}</div>
+        <div class="session-review-block">
+          <div class="session-review-exercise">Activities</div>
+          <div class="session-review-sets">${inner}</div>
+        </div>`;
+    }
+
+    async function openSessionReview(sessionId) {
+      const { data: session, error: se } = await supabaseClient
+        .from('workout_sessions')
+        .select('id, completed_at, workout_type, program_day, week, day')
+        .eq('id', sessionId)
+        .single();
+
+      const listEl = document.getElementById('session-review-content');
+
+      if (se || !session) {
+        showScreen('sessionReview', false);
+        listEl.innerHTML = '<div class="session-review-heading">Could not load workout.</div>';
+        document.getElementById('session-review-title').textContent = 'Workout';
+        return;
+      }
+
+      if (session.workout_type === 'rest') {
+        await openRestDayReview(session.program_day, session);
+        return;
+      }
+
+      sessionReviewSessionId = sessionId;
+      showScreen('sessionReview', false);
+      listEl.innerHTML = '<div class="session-review-heading">Loading…</div>';
+      const sched = PROGRAM.schedule.find(d => d.programDay === session.program_day);
+      const title = sched && sched.type !== 'rest' ? sched.workoutName : 'Workout';
+      document.getElementById('session-review-title').textContent = title;
+      const completedIso = session.completed_at ? session.completed_at : null;
+      const headLine = completedIso
+        ? `Week ${session.week} · Day ${session.day} · ${formatIsoDateLongLA(completedIso)}`
+        : `Week ${session.week} · Day ${session.day}`;
+      const { data: logs, error: le } = await supabaseClient
+        .from('exercise_logs')
+        .select('exercise_name, exercise_order, set_number, weight, reps, set_type')
+        .eq('session_id', sessionId)
+        .order('exercise_order')
+        .order('set_number');
+      if (le) {
+        listEl.innerHTML = '<div class="session-review-heading">Could not load sets.</div>';
+        return;
+      }
+      const byEx = {};
+      (logs || []).forEach(l => {
+        if (!byEx[l.exercise_name]) byEx[l.exercise_name] = [];
+        byEx[l.exercise_name].push(l);
+      });
+      let html = `<div class="session-review-heading">${headLine}</div>`;
+      Object.keys(byEx).forEach(name => {
+        const lines = byEx[name]
+          .slice()
+          .sort((a, b) => a.set_number - b.set_number)
+          .map(l => `<div class="session-review-setline">Set ${l.set_number}: ${l.weight} lbs × ${l.reps} reps</div>`)
+          .join('');
+        html += `<div class="session-review-block"><div class="session-review-exercise">${name}</div><div class="session-review-sets">${lines}</div></div>`;
+      });
+      listEl.innerHTML = html || '<div class="session-review-heading">No logged sets.</div>';
+    }
+
     // ── Schedule ──────────────────────────────────────────────────
     async function loadSchedule() {
-      if (!currentUser || !programState) return;
+      if (!currentUser) return;
+
+      const { data: stateRows } = await supabaseClient
+        .from('user_program_state')
+        .select('*')
+        .eq('user_id', currentUser.id);
+      if (!stateRows || stateRows.length === 0) return;
+      programState = stateRows[0];
+      await maybeAdvanceProgramDayAfterPstRoll();
 
       // Fetch all completed sessions
       const { data: sessions } = await supabaseClient
         .from('workout_sessions')
-        .select('id, program_day, completed_at')
+        .select('id, program_day, completed_at, workout_type, week, day')
         .eq('user_id', currentUser.id)
         .not('completed_at', 'is', null);
 
       const completedByDay = {};
       (sessions || []).forEach(s => { completedByDay[s.program_day] = s; });
 
-      // Fetch best lifts for completed sessions
-      const sessionIds = (sessions || []).map(s => s.id);
-      let bestLifts = {};
-      if (sessionIds.length > 0) {
-        const { data: logs } = await supabaseClient
-          .from('exercise_logs')
-          .select('session_id, exercise_name, weight, reps')
-          .in('session_id', sessionIds);
-
-        // Group by session, find heaviest
-        const bySession = {};
-        (logs || []).forEach(l => {
-          if (!l.weight) return;
-          if (!bySession[l.session_id] || l.weight > bySession[l.session_id].weight) {
-            bySession[l.session_id] = l;
-          }
-        });
-        // Map to program_day
-        (sessions || []).forEach(s => {
-          if (bySession[s.id]) bestLifts[s.program_day] = bySession[s.id];
-        });
-      }
-
-      const completedCount = Object.keys(completedByDay).length;
+      const completedCount = await getCompletedCount();
       document.getElementById('schedule-subtitle').textContent = `${completedCount} of 54 workouts completed`;
 
       const currentDay = programState.current_program_day;
-      const startDate = new Date(programState.start_date + 'T00:00:00');
-      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
       const container = document.getElementById('schedule-list');
       container.innerHTML = '';
@@ -2558,9 +4418,8 @@
         weekGroup.innerHTML = `<div class="week-header"><span class="week-header-title">Week ${week}</span><span class="week-header-phase">${phaseLabel}</span></div>`;
 
         weekDays.forEach(entry => {
-          const dayDate = new Date(startDate);
-          dayDate.setDate(dayDate.getDate() + entry.programDay - 1);
-          const dateStr = `${monthNames[dayDate.getMonth()]} ${dayDate.getDate()}`;
+          const assignYmd = programDayAssignYmd(entry.programDay);
+          const dateStr = formatAssignYmdShort(assignYmd);
 
           const isCompleted = !!completedByDay[entry.programDay];
           const isCurrent = entry.programDay === currentDay;
@@ -2575,41 +4434,60 @@
 
           const row = document.createElement('div');
           row.className = rowClass;
+          row.dataset.programDay = String(entry.programDay);
 
           const name = isRest ? 'Rest Day' : entry.workoutName;
           const focus = isRest ? 'Active recovery • 25 min Zone 2' : entry.focus;
-
-          let bestLiftHtml = '';
-          if (isCompleted && bestLifts[entry.programDay]) {
-            const bl = bestLifts[entry.programDay];
-            bestLiftHtml = `<div class="day-best-lift">${bl.exercise_name} ${bl.weight} × ${bl.reps}</div>`;
-          }
+          const focusLine = isCompleted && !isRest
+            ? 'Workout completed · tap for summary'
+            : isCompleted && isRest
+              ? 'Rest day logged · tap for details'
+              : focus;
 
           let rightHtml = `<div class="day-date">${dateStr}</div>`;
-          if (isCompleted && !isRest) rightHtml += `<div class="day-check">✓</div>`;
-          if (isCurrent) rightHtml += `<div class="day-today-badge">Today</div>`;
+          if (isCurrent && !isCompleted) rightHtml += `<div class="day-today-badge">Today</div>`;
 
           row.innerHTML = `
-            <div class="day-number">${entry.day}</div>
-            <div class="day-content">
-              <div class="day-workout-name">${name}</div>
-              <div class="day-workout-focus">${focus}</div>
-              ${bestLiftHtml}
+            <div class="day-row-flip-inner">
+              <div class="day-row-face day-row-face--front">
+                <div class="day-number">${entry.day}</div>
+                <div class="day-content">
+                  <div class="day-workout-name">${name}</div>
+                  <div class="day-workout-focus">${focusLine}</div>
+                </div>
+                <div class="day-right">${rightHtml}</div>
+              </div>
+              <div class="day-row-face day-row-face--back">
+                <div class="day-back-inner">
+                  <div class="day-back-volume"></div>
+                  <div class="day-back-label">lbs total volume</div>
+                  <button type="button" class="btn-onward" hidden>Onward</button>
+                </div>
+              </div>
             </div>
-            <div class="day-right">${rightHtml}</div>
           `;
 
-          // Tap to start workout
-          if (!isRest && (isCurrent || isCompleted)) {
+          if (isRest && isCompleted) {
+            row.style.cursor = 'pointer';
+            row.addEventListener('click', () => {
+              if (row.classList.contains('day-row--celebration-lock')) return;
+              const flip = row.querySelector('.day-row-flip-inner');
+              if (flip && flip.classList.contains('is-flipped')) return;
+              const sess = completedByDay[entry.programDay];
+              if (sess) openRestDayReview(entry.programDay, sess);
+            });
+          } else if (!isRest && (isCurrent || isCompleted)) {
             row.style.cursor = 'pointer';
             row.addEventListener('click', async () => {
+              if (row.classList.contains('day-row--celebration-lock')) return;
+              const flip = row.querySelector('.day-row-flip-inner');
+              if (flip && flip.classList.contains('is-flipped')) return;
               if (isCompleted) {
-                // TODO: show read-only view of logged data
+                const sess = completedByDay[entry.programDay];
+                if (sess && sess.id) openSessionReview(sess.id);
                 return;
               }
-              if (isCurrent) {
-                await startWorkout();
-              }
+              if (isCurrent) await startWorkout();
             });
           }
 
@@ -2618,13 +4496,15 @@
 
         container.appendChild(weekGroup);
       }
+
+      await maybeRunScheduleCelebration();
     }
 
     // Load data when navigating to screens
     const origShowScreen = showScreen;
     showScreen = function(name, animate) {
       origShowScreen(name, animate);
-      if (name === 'schedule') loadSchedule();
+      if (name === 'schedule') loadSchedule().catch(e => console.error(e));
       if (name === 'dashboard') loadDashboard();
       if (name === 'settings') loadSettings();
     };
@@ -2633,9 +4513,7 @@
     async function loadSettings() {
       if (!currentUser || !programState) return;
 
-      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      const sd = new Date(programState.start_date + 'T00:00:00');
-      document.getElementById('settings-start-date').textContent = `${monthNames[sd.getMonth()]} ${sd.getDate()}, ${sd.getFullYear()}`;
+      document.getElementById('settings-start-date').textContent = formatYmdLongLA(programState.start_date);
       document.getElementById('settings-date-input').value = programState.start_date;
 
       const entry = PROGRAM.schedule.find(d => d.programDay === programState.current_program_day);
@@ -2644,6 +4522,7 @@
 
       const completedCount = await getCompletedCount();
       document.getElementById('settings-completed').textContent = `${completedCount} / 54`;
+      updateSyncStatusUI();
     }
 
     // Start date picker
@@ -2664,6 +4543,7 @@
       if (!confirm('Reset all progress? This will delete all your workout data.')) return;
 
       // Delete logs first (FK dependency on sessions)
+      const r0 = await supabaseClient.from('rest_day_activities').delete().eq('user_id', currentUser.id);
       const r1 = await supabaseClient.from('exercise_logs').delete().eq('user_id', currentUser.id);
       const r2 = await supabaseClient.from('workout_sessions').delete().eq('user_id', currentUser.id);
       const r3 = await supabaseClient
@@ -2671,16 +4551,17 @@
         .update({ current_program_day: 1, updated_at: new Date().toISOString() })
         .eq('user_id', currentUser.id);
 
-      if (r1.error || r2.error || r3.error) {
-        console.error('Reset errors:', r1.error, r2.error, r3.error);
-        alert('Reset failed. Check console for details.');
+      if (r0.error || r1.error || r2.error || r3.error) {
+        console.error('Reset errors:', r0.error, r1.error, r2.error, r3.error);
+        showToast('Reset failed. Check the browser console for details.', 'error');
         return;
       }
 
+      writeSyncQueueRaw([]);
       programState.current_program_day = 1;
       loadSettings();
       loadDashboard();
-      alert('Progress reset successfully.');
+      showToast('Progress reset successfully.', 'success');
     });
 
     // Sign out
@@ -2701,12 +4582,15 @@
         .from('workout_sessions').select('*').eq('user_id', currentUser.id);
       const { data: logs } = await supabaseClient
         .from('exercise_logs').select('*').eq('user_id', currentUser.id);
+      const { data: restActs } = await supabaseClient
+        .from('rest_day_activities').select('*').eq('user_id', currentUser.id);
 
       const exportData = {
         exported_at: new Date().toISOString(),
         user_program_state: state,
         workout_sessions: sessions || [],
         exercise_logs: logs || [],
+        rest_day_activities: restActs || [],
       };
 
       const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
@@ -2726,8 +4610,15 @@
       try {
         const text = await file.text();
         const data = JSON.parse(text);
+        const verr = validateImportPayload(data);
+        if (verr.length) {
+          const msg = verr.slice(0, 4).join(' ') + (verr.length > 4 ? ' …' : '');
+          showToast(msg, 'error');
+          e.target.value = '';
+          return;
+        }
 
-        if (!confirm(`Import ${data.workout_sessions?.length || 0} sessions and ${data.exercise_logs?.length || 0} exercise logs?`)) return;
+        if (!confirm(`Import ${data.workout_sessions?.length || 0} sessions, ${data.exercise_logs?.length || 0} logs, ${data.rest_day_activities?.length || 0} rest activities?`)) return;
 
         // Update program state
         if (data.user_program_state) {
@@ -2753,11 +4644,16 @@
           await supabaseClient.from('exercise_logs').upsert(logs, { onConflict: 'id' });
         }
 
-        alert('Import complete!');
+        if (data.rest_day_activities?.length > 0) {
+          const ra = data.rest_day_activities.map(r => ({ ...r, user_id: currentUser.id }));
+          await supabaseClient.from('rest_day_activities').upsert(ra, { onConflict: 'id' });
+        }
+
+        showToast('Import complete.', 'success');
         loadDashboard();
         loadSettings();
       } catch (err) {
-        alert('Import failed: ' + err.message);
+        showToast('Import failed: ' + (err && err.message ? err.message : 'invalid file'), 'error');
       }
       e.target.value = '';
     });
@@ -2767,21 +4663,12 @@
       navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
 
-    // ── Offline Sync ──────────────────────────────────────────────
-    window.addEventListener('online', async () => {
-      // Flush any pending writes from localStorage
-      const pending = localStorage.getItem('pendingSync');
-      if (!pending || !currentUser) return;
-      try {
-        const ops = JSON.parse(pending);
-        for (const op of ops) {
-          if (op.table === 'exercise_logs') {
-            await supabaseClient.from('exercise_logs').insert(op.data);
-          }
-        }
-        localStorage.removeItem('pendingSync');
-      } catch(e) {}
+    // ── Offline sync queue (exercise logs) ─────────────────────────
+    window.addEventListener('online', () => {
+      updateSyncStatusUI();
+      flushSyncQueue().catch(e => console.warn('flushSyncQueue', e));
     });
+    window.addEventListener('offline', () => updateSyncStatusUI());
 
     // ── Init ──────────────────────────────────────────────────────
     initAuth();
