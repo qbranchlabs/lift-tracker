@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lift-tracker-v7';
+const CACHE_NAME = 'lift-tracker-v8';
 const ASSETS = [
   './',
   './index.html',
@@ -37,12 +37,34 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Cache-first for everything else
+  // Network-first for HTML shell so deploys show up; cache-first for other static assets (offline)
+  const isNavigate = event.request.mode === 'navigate';
+  const path = url.pathname.replace(/\/$/, '') || '/';
+  const isAppHtml =
+    isNavigate ||
+    path === '/' ||
+    path.endsWith('index.html') ||
+    (url.origin === self.location.origin && path.endsWith('.html'));
+
+  if (isAppHtml && url.origin === self.location.origin) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          if (response.ok && event.request.method === 'GET') {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
       return fetch(event.request).then(response => {
-        // Cache successful GET responses
         if (response.ok && event.request.method === 'GET') {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
