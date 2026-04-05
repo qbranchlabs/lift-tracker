@@ -3648,7 +3648,12 @@
 
     /** Plan day of the template used for a substitute session; null if canonical or missing column. */
     function sessionSubstituteTemplateDay(s) {
-      return s ? normProgramDay(s.substitute_source_program_day) : null;
+      if (!s) return null;
+      const sub = normProgramDay(s.substitute_source_program_day);
+      if (sub == null) return null;
+      const slot = normProgramDay(s.program_day);
+      if (slot != null && sub === slot) return null;
+      return sub;
     }
 
     /** Completed session that counts as “did the planned training for program_day” (not a substitute-for-today session). */
@@ -5013,11 +5018,25 @@
         .from('workout_sessions')
         .select('*')
         .eq('user_id', currentUser.id);
-      if (schedSessErr) console.error('loadSchedule workout_sessions', schedSessErr);
+      if (schedSessErr) {
+        console.error('loadSchedule workout_sessions', schedSessErr);
+        const msg = schedSessErr && schedSessErr.message ? schedSessErr.message : String(schedSessErr);
+        showToast(
+          'Could not load workout history: ' +
+            msg +
+            '. If Table Editor shows rows but this stays empty, run the RLS block in supabase_schema.sql.',
+          'error',
+        );
+      }
       const sessions = (allWRows || []).filter(isSessionCompleted);
 
       const completedCount = await getCompletedCount(sessions);
-      document.getElementById('schedule-subtitle').textContent = `${completedCount} of 54 workouts completed`;
+      let subTitle = `${completedCount} of 54 workouts completed`;
+      if (new URLSearchParams(location.search).has('debug')) {
+        subTitle +=
+          ` · fetched ${(allWRows || []).length} rows, ${sessions.length} w/ completed_at · ${schedSessErr ? 'ERR' : 'ok'}`;
+      }
+      document.getElementById('schedule-subtitle').textContent = subTitle;
 
       const currentDay = normProgramDay(programState.current_program_day) ?? programState.current_program_day;
 

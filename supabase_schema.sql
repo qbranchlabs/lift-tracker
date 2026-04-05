@@ -108,3 +108,74 @@ ALTER TABLE user_program_state
 
 ALTER TABLE workout_sessions
   ADD COLUMN IF NOT EXISTS substitute_source_program_day int;
+
+-- ── Row Level Security (if Schedule shows 0 workouts but data exists in Table Editor) ──
+-- Symptom: app loads, login works, but completed workouts never appear — often missing SELECT policies.
+-- Run once per project; duplicate policy names are avoided with DROP IF EXISTS.
+
+ALTER TABLE workout_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_program_state ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "workout_sessions_select_own" ON workout_sessions;
+DROP POLICY IF EXISTS "workout_sessions_insert_own" ON workout_sessions;
+DROP POLICY IF EXISTS "workout_sessions_update_own" ON workout_sessions;
+DROP POLICY IF EXISTS "workout_sessions_delete_own" ON workout_sessions;
+
+CREATE POLICY "workout_sessions_select_own"
+  ON workout_sessions FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "workout_sessions_insert_own"
+  ON workout_sessions FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "workout_sessions_update_own"
+  ON workout_sessions FOR UPDATE
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "workout_sessions_delete_own"
+  ON workout_sessions FOR DELETE
+  USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "user_program_state_select_own" ON user_program_state;
+DROP POLICY IF EXISTS "user_program_state_insert_own" ON user_program_state;
+DROP POLICY IF EXISTS "user_program_state_update_own" ON user_program_state;
+DROP POLICY IF EXISTS "user_program_state_delete_own" ON user_program_state;
+
+CREATE POLICY "user_program_state_select_own"
+  ON user_program_state FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "user_program_state_insert_own"
+  ON user_program_state FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "user_program_state_update_own"
+  ON user_program_state FOR UPDATE
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "user_program_state_delete_own"
+  ON user_program_state FOR DELETE
+  USING (auth.uid() = user_id);
+
+-- exercise_logs: tie rows to sessions you own
+ALTER TABLE exercise_logs ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "exercise_logs_all_own_session" ON exercise_logs;
+
+CREATE POLICY "exercise_logs_all_own_session"
+  ON exercise_logs FOR ALL
+  USING (
+    EXISTS (
+      SELECT 1 FROM workout_sessions w
+      WHERE w.id = exercise_logs.session_id AND w.user_id = auth.uid()
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM workout_sessions w
+      WHERE w.id = exercise_logs.session_id AND w.user_id = auth.uid()
+    )
+  );
