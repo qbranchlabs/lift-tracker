@@ -95,3 +95,16 @@ SELECT
 -- FROM exercise_logs
 -- GROUP BY session_id, exercise_order, set_number
 -- HAVING COUNT(*) > 1;
+
+-- ── Workout substitution (Today uses another plan day’s template until PST midnight) ──
+ALTER TABLE user_program_state
+  ADD COLUMN IF NOT EXISTS workout_substitute_program_day int,
+  ADD COLUMN IF NOT EXISTS workout_substitute_for_ymd text;
+
+-- After a substitute session completes: calendar for program_day >= base shifts to start at tail_start_ymd (N still owed).
+ALTER TABLE user_program_state
+  ADD COLUMN IF NOT EXISTS schedule_tail_base_program_day int,
+  ADD COLUMN IF NOT EXISTS schedule_tail_start_ymd text;
+
+ALTER TABLE workout_sessions
+  ADD COLUMN IF NOT EXISTS substitute_source_program_day int;

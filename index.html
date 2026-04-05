@@ -2372,6 +2372,68 @@
     font-variant-numeric: tabular-nums;
   }
 
+  .event-substitute-hint {
+    font-size: 12px;
+    font-weight: 400;
+    color: #7a7166;
+    line-height: 1.35;
+    margin: 8px 0 4px;
+    padding: 8px 10px;
+    background: rgba(232, 93, 58, 0.08);
+    border-radius: 8px;
+    border: 1px solid rgba(232, 93, 58, 0.2);
+  }
+
+  #screen-substitute-preview .top-bar-back {
+    text-align: left;
+  }
+
+  .substitute-preview-lede {
+    text-align: center;
+    font-size: 13px;
+    color: #6a6258;
+    padding: 8px 16px 12px;
+    line-height: 1.4;
+  }
+
+  .substitute-preview-list-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #888;
+    padding: 8px 16px 6px;
+  }
+
+  .substitute-preview-ul {
+    list-style: none;
+    margin: 0 16px 20px;
+    padding: 0;
+    background: #fff;
+    border: 1px solid #ddd8ce;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .substitute-preview-ul li {
+    font-size: 15px;
+    color: #2c2c2c;
+    padding: 12px 14px;
+    border-bottom: 1px solid #f0ece4;
+  }
+
+  .substitute-preview-ul li:last-child {
+    border-bottom: none;
+  }
+
+  .substitute-preview-actions {
+    padding: 0 16px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
   .rest-summary-row {
     display: flex;
     align-items: center;
@@ -2523,6 +2585,7 @@
           <div class="event-workout-label" id="dash-workout-label">Today's Workout</div>
           <div class="event-workout-name" id="dash-workout-name"></div>
           <div class="event-workout-focus" id="dash-workout-focus"></div>
+          <div class="event-substitute-hint" id="dash-substitute-hint" hidden></div>
 
           <div class="event-details" id="dash-event-details">
             <div class="event-detail-item">
@@ -2825,6 +2888,26 @@
   </div>
 
   <!-- ============================================================ -->
+  <!-- SCREEN: SUBSTITUTE WORKOUT PREVIEW (from Schedule)           -->
+  <!-- ============================================================ -->
+  <div id="screen-substitute-preview" class="screen">
+    <div class="top-bar top-bar-logging">
+      <button type="button" class="top-bar-back" id="btn-substitute-preview-back">&larr; Schedule</button>
+      <span class="top-bar-title" id="substitute-preview-title">Workout</span>
+      <span class="top-bar-count"></span>
+    </div>
+    <div class="screen-body">
+      <p class="substitute-preview-lede" id="substitute-preview-lede">Overview only — full targets appear when you log the session.</p>
+      <div class="substitute-preview-list-title">Exercises</div>
+      <ul class="substitute-preview-ul" id="substitute-preview-exercises"></ul>
+      <div class="substitute-preview-actions">
+        <button type="button" class="btn-primary" id="btn-substitute-confirm">Substitute for Today&rsquo;s Workout</button>
+        <button type="button" class="btn-secondary" id="btn-substitute-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
   <!-- SCREEN: SESSION REVIEW (from Schedule)                       -->
   <!-- ============================================================ -->
   <div id="screen-session-review" class="screen">
@@ -2866,12 +2949,13 @@
       schedule: document.getElementById('screen-schedule'),
       settings: document.getElementById('screen-settings'),
       sessionReview: document.getElementById('screen-session-review'),
+      substitutePreview: document.getElementById('screen-substitute-preview'),
     };
 
     let currentScreen = 'login';
 
     // Screen order for determining slide direction
-    const screenOrder = ['login', 'dashboard', 'logging', 'schedule', 'sessionReview', 'settings'];
+    const screenOrder = ['login', 'dashboard', 'logging', 'schedule', 'substitutePreview', 'sessionReview', 'settings'];
 
     function showScreen(name, animate = true) {
       if (name === currentScreen) return;
@@ -2905,7 +2989,8 @@
       currentScreen = name;
 
       // Update bottom nav active states across all nav bars
-      const navScreen = name === 'sessionReview' ? 'schedule' : name;
+      const navScreen =
+        name === 'sessionReview' || name === 'substitutePreview' ? 'schedule' : name;
       document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.nav === navScreen);
       });
@@ -3338,6 +3423,22 @@
         if (st.start_date != null && !/^\d{4}-\d{2}-\d{2}$/.test(st.start_date)) {
           errors.push('start_date must look like YYYY-MM-DD.');
         }
+        const subPd = st.workout_substitute_program_day;
+        if (subPd != null && (!Number.isInteger(subPd) || subPd < 1 || subPd > 91)) {
+          errors.push('workout_substitute_program_day must be an integer from 1 to 91 or null.');
+        }
+        const subYmd = st.workout_substitute_for_ymd;
+        if (subYmd != null && subYmd !== '' && !/^\d{4}-\d{2}-\d{2}$/.test(subYmd)) {
+          errors.push('workout_substitute_for_ymd must look like YYYY-MM-DD or null.');
+        }
+        const tailBase = st.schedule_tail_base_program_day;
+        if (tailBase != null && (!Number.isInteger(tailBase) || tailBase < 1 || tailBase > 91)) {
+          errors.push('schedule_tail_base_program_day must be an integer from 1 to 91 or null.');
+        }
+        const tailYmd = st.schedule_tail_start_ymd;
+        if (tailYmd != null && tailYmd !== '' && !/^\d{4}-\d{2}-\d{2}$/.test(tailYmd)) {
+          errors.push('schedule_tail_start_ymd must look like YYYY-MM-DD or null.');
+        }
       }
       if (data.workout_sessions != null) {
         if (!Array.isArray(data.workout_sessions)) errors.push('workout_sessions must be an array.');
@@ -3352,6 +3453,10 @@
             }
             if (s.id != null && typeof s.id !== 'string') {
               errors.push('workout_sessions[' + i + '].id must be a string (UUID).');
+            }
+            const ssub = s.substitute_source_program_day;
+            if (ssub != null && (!Number.isInteger(ssub) || ssub < 1 || ssub > 91)) {
+              errors.push('workout_sessions[' + i + '].substitute_source_program_day must be an integer from 1 to 91 or null.');
             }
           });
         }
@@ -3413,7 +3518,141 @@
 
     function programDayAssignYmd(programDay) {
       if (!programState || !programState.start_date) return todayYmdPST();
+      normalizeProgramStateSubstituteKeys();
+      const tailBase = programState.schedule_tail_base_program_day;
+      const tailStart = programState.schedule_tail_start_ymd;
+      if (tailBase != null && tailStart && programDay >= tailBase) {
+        return addCalendarDaysToYmd(tailStart, programDay - tailBase);
+      }
       return addCalendarDaysToYmd(programState.start_date, programDay - 1);
+    }
+
+    function normalizeProgramStateSubstituteKeys() {
+      if (!programState) return;
+      if (programState.workout_substitute_program_day === undefined) {
+        programState.workout_substitute_program_day = null;
+      }
+      if (programState.workout_substitute_for_ymd === undefined) {
+        programState.workout_substitute_for_ymd = null;
+      }
+      if (programState.schedule_tail_base_program_day === undefined) {
+        programState.schedule_tail_base_program_day = null;
+      }
+      if (programState.schedule_tail_start_ymd === undefined) {
+        programState.schedule_tail_start_ymd = null;
+      }
+    }
+
+    /**
+     * Canonical completion of the owed day N folds the tail calendar back into start_date
+     * so the whole plan uses one anchor again.
+     */
+    async function mergeScheduleTailIntoStartDateIfNeeded(completedProgramDay) {
+      if (!programState || !currentUser) return;
+      normalizeProgramStateSubstituteKeys();
+      const tb = programState.schedule_tail_base_program_day;
+      const ts = programState.schedule_tail_start_ymd;
+      if (tb == null || ts == null || completedProgramDay !== tb) return;
+      const newStart = addCalendarDaysToYmd(ts, -(completedProgramDay - 1));
+      const { error } = await supabaseClient
+        .from('user_program_state')
+        .update({
+          start_date: newStart,
+          schedule_tail_base_program_day: null,
+          schedule_tail_start_ymd: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', currentUser.id);
+      if (error) {
+        console.error('mergeScheduleTailIntoStartDateIfNeeded', error);
+        return;
+      }
+      programState.start_date = newStart;
+      programState.schedule_tail_base_program_day = null;
+      programState.schedule_tail_start_ymd = null;
+    }
+
+    async function clearStaleWorkoutSubstitute() {
+      if (!programState || !currentUser) return;
+      normalizeProgramStateSubstituteKeys();
+      const ymd = programState.workout_substitute_for_ymd;
+      const pd = programState.workout_substitute_program_day;
+      if (pd == null || !ymd) return;
+      if (ymd === todayYmdPST()) return;
+      await supabaseClient
+        .from('user_program_state')
+        .update({
+          workout_substitute_program_day: null,
+          workout_substitute_for_ymd: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', currentUser.id);
+      programState.workout_substitute_program_day = null;
+      programState.workout_substitute_for_ymd = null;
+    }
+
+    function getCanonicalScheduleEntry() {
+      if (!programState) return PROGRAM.schedule[0];
+      return PROGRAM.schedule.find(d => d.programDay === programState.current_program_day)
+        || PROGRAM.schedule[PROGRAM.schedule.length - 1];
+    }
+
+    /** Template for Today’s session (substitute training overrides canonical when set for this PST calendar day). */
+    function getTodayWorkoutScheduleEntry() {
+      const canon = getCanonicalScheduleEntry();
+      if (!programState) return canon;
+      normalizeProgramStateSubstituteKeys();
+      const subPd = programState.workout_substitute_program_day;
+      const subYmd = programState.workout_substitute_for_ymd;
+      if (subPd != null && subYmd === todayYmdPST()) {
+        const sub = PROGRAM.schedule.find(d => d.programDay === subPd);
+        if (sub && sub.type === 'training') return sub;
+      }
+      return canon;
+    }
+
+    function scheduleEntryForProgramDay(pd) {
+      return PROGRAM.schedule.find(d => d.programDay === pd);
+    }
+
+    /** Completed session that counts as “did the planned training for program_day” (not a substitute-for-today session). */
+    function sessionIsCanonicalTrainingComplete(s) {
+      if (!s || !s.completed_at) return false;
+      if (s.workout_type === 'rest') return false;
+      if (s.substitute_source_program_day != null) return false;
+      return true;
+    }
+
+    function sessionIsRestComplete(s, pd) {
+      return !!(s && s.completed_at && s.program_day === pd && s.workout_type === 'rest');
+    }
+
+    /**
+     * Schedule/advance: day pd is satisfied (rest logged, or training done for that slot, or training day was
+     * completed early as someone else’s substitute template).
+     */
+    function isProgramDaySlotSatisfied(pd, sessions) {
+      const entry = scheduleEntryForProgramDay(pd);
+      if (!entry) return false;
+      const list = sessions || [];
+      if (entry.type === 'rest') {
+        return list.some(s => sessionIsRestComplete(s, pd));
+      }
+      if (list.some(s => s.program_day === pd && sessionIsCanonicalTrainingComplete(s))) return true;
+      return list.some(s => s.completed_at && s.substitute_source_program_day === pd);
+    }
+
+    function scheduleRowCompletedSession(entry, sessions) {
+      if (entry.type === 'rest') {
+        return (sessions || []).find(s => sessionIsRestComplete(s, entry.programDay)) || null;
+      }
+      const list = (sessions || []).filter(s => s.completed_at);
+      const canon = list.find(s => s.program_day === entry.programDay && sessionIsCanonicalTrainingComplete(s));
+      if (canon) return canon;
+      const sub = list.filter(s => s.substitute_source_program_day === entry.programDay);
+      if (!sub.length) return null;
+      sub.sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at));
+      return sub[0];
     }
 
     async function advanceProgramDayInDbOnly() {
@@ -3426,20 +3665,23 @@
       programState.current_program_day = nextDay;
     }
 
-    /** After midnight PST, advance to next program day if today’s assignment is fully logged. */
+    /**
+     * After midnight PST, advance current_program_day while the current slot is satisfied
+     * (rest logged, canonical training done, or training day already fulfilled as a substitute template)
+     * and its calendar assignment is before “today” in America/Los_Angeles.
+     * Repeated iterations skip multiple past completed days in one load (catch-up).
+     */
     async function maybeAdvanceProgramDayAfterPstRoll() {
       if (!programState || !currentUser) return;
+      const { data: sessions } = await supabaseClient
+        .from('workout_sessions')
+        .select('program_day, substitute_source_program_day, workout_type, completed_at')
+        .eq('user_id', currentUser.id)
+        .not('completed_at', 'is', null);
+
       for (let i = 0; i < 96; i++) {
         const pd = programState.current_program_day;
-        const { data: done } = await supabaseClient
-          .from('workout_sessions')
-          .select('id')
-          .eq('user_id', currentUser.id)
-          .eq('program_day', pd)
-          .not('completed_at', 'is', null)
-          .limit(1)
-          .maybeSingle();
-        if (!done) break;
+        if (!isProgramDaySlotSatisfied(pd, sessions)) break;
         const assignYmd = programDayAssignYmd(pd);
         const pstYmd = todayYmdPST();
         if (assignYmd >= pstYmd) break;
@@ -3471,8 +3713,12 @@
       }
 
       programState = state;
+      normalizeProgramStateSubstituteKeys();
+      await clearStaleWorkoutSubstitute();
       await maybeAdvanceProgramDayAfterPstRoll();
-      todayEntry = PROGRAM.schedule.find(d => d.programDay === programState.current_program_day);
+
+      const canonicalEntry = getCanonicalScheduleEntry();
+      todayEntry = getTodayWorkoutScheduleEntry();
       if (!todayEntry) todayEntry = PROGRAM.schedule[PROGRAM.schedule.length - 1];
 
       const { data: dashCompletedSession } = await supabaseClient
@@ -3480,6 +3726,7 @@
         .select('id, workout_type, completed_at')
         .eq('user_id', currentUser.id)
         .eq('program_day', programState.current_program_day)
+        .is('substitute_source_program_day', null)
         .not('completed_at', 'is', null)
         .limit(1)
         .maybeSingle();
@@ -3502,13 +3749,13 @@
       workoutEventEl.classList.toggle('workout-event--completed', dashDayComplete);
 
       // Phase title
-      document.getElementById('dash-phase-week').textContent = `Week ${todayEntry.week}, Day ${todayEntry.day}`;
-      const phase = PROGRAM.phases.find(p => p.number === todayEntry.phase);
-      document.getElementById('dash-phase-label').textContent = `Phase ${todayEntry.phase} — ${phase ? phase.name : ''}`;
+      document.getElementById('dash-phase-week').textContent = `Week ${canonicalEntry.week}, Day ${canonicalEntry.day}`;
+      const phase = PROGRAM.phases.find(p => p.number === canonicalEntry.phase);
+      document.getElementById('dash-phase-label').textContent = `Phase ${canonicalEntry.phase} — ${phase ? phase.name : ''}`;
 
       // Gauges
       const completedCount = await getCompletedCount();
-      const weekNum = todayEntry.week;
+      const weekNum = canonicalEntry.week;
       const leftCount = 54 - completedCount;
       animateGauge('dash-gauge-done', completedCount);
       animateGauge('dash-gauge-week', weekNum);
@@ -3575,6 +3822,31 @@
         }
       }
 
+      const subHintEl = document.getElementById('dash-substitute-hint');
+      if (subHintEl) {
+        if (
+          todayEntry &&
+          todayEntry.type === 'training' &&
+          canonicalEntry &&
+          canonicalEntry.programDay !== todayEntry.programDay
+        ) {
+          subHintEl.hidden = false;
+          subHintEl.textContent =
+            'Substituting: ' +
+            todayEntry.workoutName +
+            ' (plan day ' +
+            todayEntry.programDay +
+            '). Your program position stays Week ' +
+            canonicalEntry.week +
+            ', Day ' +
+            canonicalEntry.day +
+            ' until midnight Pacific.';
+        } else {
+          subHintEl.hidden = true;
+          subHintEl.textContent = '';
+        }
+      }
+
       if (!dashDayComplete && todayEntry.type !== 'rest') {
         await loadLastSession(todayEntry.workoutType);
       } else {
@@ -3586,13 +3858,24 @@
     }
 
     async function getCompletedCount() {
-      const { count } = await supabaseClient
+      const { data: sessions } = await supabaseClient
         .from('workout_sessions')
-        .select('*', { count: 'exact', head: true })
+        .select('program_day, substitute_source_program_day, workout_type')
         .eq('user_id', currentUser.id)
-        .not('completed_at', 'is', null)
-        .or('workout_type.is.null,workout_type.neq.rest');
-      return count || 0;
+        .not('completed_at', 'is', null);
+
+      const done = new Set();
+      for (const s of sessions || []) {
+        if (s.workout_type === 'rest') continue;
+        if (s.substitute_source_program_day != null) {
+          const e = scheduleEntryForProgramDay(s.substitute_source_program_day);
+          if (e && e.type === 'training') done.add(s.substitute_source_program_day);
+        } else {
+          const e = scheduleEntryForProgramDay(s.program_day);
+          if (e && e.type === 'training') done.add(s.program_day);
+        }
+      }
+      return done.size;
     }
 
     async function loadLastSession(workoutType) {
@@ -3675,15 +3958,17 @@
     }
 
     async function completeRestDay() {
-      if (!programState || !currentUser || !todayEntry || todayEntry.type !== 'rest') return;
+      if (!programState || !currentUser) return;
+      const canon = getCanonicalScheduleEntry();
+      if (!canon || canon.type !== 'rest') return;
       const now = new Date().toISOString();
       const { error } = await supabaseClient.from('workout_sessions').insert({
         user_id: currentUser.id,
         workout_type: 'rest',
-        week: todayEntry.week,
-        day: todayEntry.day,
-        program_day: todayEntry.programDay,
-        phase: todayEntry.phase,
+        week: canon.week,
+        day: canon.day,
+        program_day: canon.programDay,
+        phase: canon.phase,
         completed_at: now,
       });
       if (error) {
@@ -3691,6 +3976,7 @@
         showToast('Could not save rest day. Try again.', 'error');
         return;
       }
+      await mergeScheduleTailIntoStartDateIfNeeded(canon.programDay);
       await loadDashboard();
     }
 
@@ -3698,8 +3984,73 @@
     let workoutCompletionInFlight = false;
     let startWorkoutInFlight = false;
     let pendingScheduleCelebration = null;
+    let substitutePreviewEntry = null;
 
     const waitMs = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    async function openSubstitutePreview(entry) {
+      if (!entry || entry.type !== 'training' || !programState || !currentUser) return;
+      if (entry.programDay === programState.current_program_day) return;
+      const { data: sessions } = await supabaseClient
+        .from('workout_sessions')
+        .select('program_day, substitute_source_program_day, workout_type, completed_at')
+        .eq('user_id', currentUser.id)
+        .not('completed_at', 'is', null);
+      if (isProgramDaySlotSatisfied(entry.programDay, sessions)) {
+        showToast('That workout is already completed in your plan.', 'info');
+        return;
+      }
+      substitutePreviewEntry = entry;
+      document.getElementById('substitute-preview-title').textContent = entry.workoutName;
+      const ul = document.getElementById('substitute-preview-exercises');
+      ul.innerHTML = (entry.exercises || [])
+        .map(ex => '<li>' + ex.name.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</li>')
+        .join('');
+      showScreen('substitutePreview');
+    }
+
+    async function confirmWorkoutSubstitute() {
+      if (!substitutePreviewEntry || !programState || !currentUser) return;
+      const entry = substitutePreviewEntry;
+      if (entry.programDay === programState.current_program_day) {
+        showToast('This is already today’s scheduled workout.', 'info');
+        return;
+      }
+      const { data: doneCanon } = await supabaseClient
+        .from('workout_sessions')
+        .select('id')
+        .eq('user_id', currentUser.id)
+        .eq('program_day', programState.current_program_day)
+        .is('substitute_source_program_day', null)
+        .not('completed_at', 'is', null)
+        .limit(1)
+        .maybeSingle();
+      if (doneCanon) {
+        showToast('Today is already complete. Substitution unlocks tomorrow.', 'info');
+        return;
+      }
+      const ymd = todayYmdPST();
+      const { error } = await supabaseClient
+        .from('user_program_state')
+        .update({
+          workout_substitute_program_day: entry.programDay,
+          workout_substitute_for_ymd: ymd,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', currentUser.id);
+      if (error) {
+        console.error('confirmWorkoutSubstitute', error);
+        showToast('Could not save substitution. Try again.', 'error');
+        return;
+      }
+      programState.workout_substitute_program_day = entry.programDay;
+      programState.workout_substitute_for_ymd = ymd;
+      substitutePreviewEntry = null;
+      showToast('Today’s workout updated. Open Today to start when ready.', 'success');
+      showScreen('schedule', false);
+      loadSchedule().catch(e => console.error(e));
+      loadDashboard();
+    }
 
     function formatSessionVolume(n) {
       if (!Number.isFinite(n)) return '0';
@@ -3777,15 +4128,25 @@
     }
 
     async function startWorkout() {
-      if (!todayEntry || todayEntry.type === 'rest' || !currentUser) return;
+      if (!programState || !currentUser) return;
       if (startWorkoutInFlight) return;
       startWorkoutInFlight = true;
       try {
+        normalizeProgramStateSubstituteKeys();
+        todayEntry = getTodayWorkoutScheduleEntry();
+        if (!todayEntry) todayEntry = PROGRAM.schedule[PROGRAM.schedule.length - 1];
+        if (todayEntry.type === 'rest') return;
+
+        const canon = getCanonicalScheduleEntry();
+        const tmpl = todayEntry;
+        if (tmpl.type !== 'training') return;
+
         const { data: doneAlready } = await supabaseClient
           .from('workout_sessions')
           .select('id')
           .eq('user_id', currentUser.id)
-          .eq('program_day', todayEntry.programDay)
+          .eq('program_day', programState.current_program_day)
+          .is('substitute_source_program_day', null)
           .not('completed_at', 'is', null)
           .limit(1)
           .maybeSingle();
@@ -3798,7 +4159,7 @@
           .from('workout_sessions')
           .select('id')
           .eq('user_id', currentUser.id)
-          .eq('program_day', todayEntry.programDay)
+          .eq('program_day', programState.current_program_day)
           .is('completed_at', null)
           .order('id', { ascending: false })
           .limit(1)
@@ -3812,15 +4173,18 @@
           return;
         }
 
+        const subSrc =
+          tmpl.programDay !== programState.current_program_day ? tmpl.programDay : null;
         const { data: session, error } = await supabaseClient
           .from('workout_sessions')
           .insert({
             user_id: currentUser.id,
-            workout_type: todayEntry.workoutType,
-            week: todayEntry.week,
-            day: todayEntry.day,
-            program_day: todayEntry.programDay,
-            phase: todayEntry.phase,
+            workout_type: tmpl.workoutType,
+            week: canon.week,
+            day: canon.day,
+            program_day: programState.current_program_day,
+            phase: canon.phase,
+            substitute_source_program_day: subSrc,
           })
           .select()
           .single();
@@ -3846,9 +4210,24 @@
     }
 
     document.getElementById('btn-start-workout').addEventListener('click', () => {
-      if (!todayEntry) return;
+      if (!programState) return;
+      normalizeProgramStateSubstituteKeys();
+      todayEntry = getTodayWorkoutScheduleEntry();
+      if (!todayEntry) todayEntry = PROGRAM.schedule[PROGRAM.schedule.length - 1];
       if (todayEntry.type === 'rest') openRestActivityModal();
       else startWorkout();
+    });
+
+    document.getElementById('btn-substitute-preview-back').addEventListener('click', () => {
+      substitutePreviewEntry = null;
+      showScreen('schedule');
+    });
+    document.getElementById('btn-substitute-cancel').addEventListener('click', () => {
+      substitutePreviewEntry = null;
+      showScreen('schedule');
+    });
+    document.getElementById('btn-substitute-confirm').addEventListener('click', () => {
+      confirmWorkoutSubstitute().catch(e => console.error(e));
     });
 
     document.getElementById('btn-skip-rest-day').addEventListener('click', () => completeRestDay());
@@ -4335,6 +4714,16 @@
           return;
         }
 
+        const { data: completingMeta } = await supabaseClient
+          .from('workout_sessions')
+          .select('substitute_source_program_day')
+          .eq('id', currentSessionId)
+          .maybeSingle();
+        const subSrc =
+          completingMeta && completingMeta.substitute_source_program_day != null
+            ? completingMeta.substitute_source_program_day
+            : null;
+
         const { error: updErr } = await supabaseClient
           .from('workout_sessions')
           .update({ completed_at: new Date().toISOString() })
@@ -4350,8 +4739,41 @@
         localStorage.removeItem(`session_${sid}`);
         currentSessionId = null;
 
-        if (finishedProgramDay != null) {
-          pendingScheduleCelebration = { programDay: finishedProgramDay, volume: sessionVolume };
+        if (subSrc != null && currentUser && finishedProgramDay != null) {
+          const nextPlanYmd = addCalendarDaysToYmd(todayYmdPST(), 1);
+          await supabaseClient
+            .from('user_program_state')
+            .update({
+              workout_substitute_program_day: null,
+              workout_substitute_for_ymd: null,
+              schedule_tail_base_program_day: finishedProgramDay,
+              schedule_tail_start_ymd: nextPlanYmd,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('user_id', currentUser.id);
+          if (programState) {
+            programState.workout_substitute_program_day = null;
+            programState.workout_substitute_for_ymd = null;
+            programState.schedule_tail_base_program_day = finishedProgramDay;
+            programState.schedule_tail_start_ymd = nextPlanYmd;
+          }
+          const nLabel = finishedProgramDay != null ? finishedProgramDay : '';
+          showToast(
+            'Substitute workout saved to your plan. Your original day ' +
+              nLabel +
+              ' workout is still next on Today.',
+            'success',
+          );
+        }
+
+        if (subSrc == null && finishedProgramDay != null) {
+          await mergeScheduleTailIntoStartDateIfNeeded(finishedProgramDay);
+        }
+
+        const celebrateDay =
+          subSrc != null ? subSrc : finishedProgramDay;
+        if (celebrateDay != null) {
+          pendingScheduleCelebration = { programDay: celebrateDay, volume: sessionVolume };
         }
         showScreen('schedule', true);
       } finally {
@@ -4469,7 +4891,7 @@
     async function openSessionReview(sessionId) {
       const { data: session, error: se } = await supabaseClient
         .from('workout_sessions')
-        .select('id, completed_at, workout_type, program_day, week, day')
+        .select('id, completed_at, workout_type, program_day, week, day, substitute_source_program_day')
         .eq('id', sessionId)
         .single();
 
@@ -4490,7 +4912,11 @@
       sessionReviewSessionId = sessionId;
       showScreen('sessionReview', false);
       listEl.innerHTML = '<div class="session-review-heading">Loading…</div>';
-      const sched = PROGRAM.schedule.find(d => d.programDay === session.program_day);
+      const templateDay =
+        session.substitute_source_program_day != null
+          ? session.substitute_source_program_day
+          : session.program_day;
+      const sched = PROGRAM.schedule.find(d => d.programDay === templateDay);
       const title = sched && sched.type !== 'rest' ? sched.workoutName : 'Workout';
       document.getElementById('session-review-title').textContent = title;
       const completedIso = session.completed_at ? session.completed_at : null;
@@ -4534,17 +4960,16 @@
         .eq('user_id', currentUser.id);
       if (!stateRows || stateRows.length === 0) return;
       programState = stateRows[0];
+      normalizeProgramStateSubstituteKeys();
+      await clearStaleWorkoutSubstitute();
       await maybeAdvanceProgramDayAfterPstRoll();
 
       // Fetch all completed sessions
       const { data: sessions } = await supabaseClient
         .from('workout_sessions')
-        .select('id, program_day, completed_at, workout_type, week, day')
+        .select('id, program_day, completed_at, workout_type, week, day, substitute_source_program_day')
         .eq('user_id', currentUser.id)
         .not('completed_at', 'is', null);
-
-      const completedByDay = {};
-      (sessions || []).forEach(s => { completedByDay[s.program_day] = s; });
 
       const completedCount = await getCompletedCount();
       document.getElementById('schedule-subtitle').textContent = `${completedCount} of 54 workouts completed`;
@@ -4573,7 +4998,8 @@
           const assignYmd = programDayAssignYmd(entry.programDay);
           const dateStr = formatAssignYmdShort(assignYmd);
 
-          const isCompleted = !!completedByDay[entry.programDay];
+          const rowSess = scheduleRowCompletedSession(entry, sessions);
+          const isCompleted = !!rowSess;
           const isCurrent = entry.programDay === currentDay;
           const isFuture = entry.programDay > currentDay;
           const isRest = entry.type === 'rest';
@@ -4583,9 +5009,12 @@
           else if (isCurrent) rowClass += ' current';
           else if (isFuture) rowClass += ' future';
           if (isRest) rowClass += ' rest';
+          const isSubstitutePick = !isRest && !isCompleted && !isCurrent;
           const isInteractive =
             (isRest && isCompleted) ||
-            (!isRest && (isCurrent || isCompleted));
+            (!isRest && isCompleted) ||
+            (!isRest && isCurrent && !isCompleted) ||
+            isSubstitutePick;
           if (isInteractive) rowClass += ' day-row--interactive';
 
           const row = document.createElement('div');
@@ -4594,11 +5023,10 @@
 
           const name = isRest ? 'Rest Day' : entry.workoutName;
           const focus = isRest ? 'Active recovery • 25 min Zone 2' : entry.focus;
-          const focusLine = isCompleted && !isRest
-            ? 'Workout completed · tap for summary'
-            : isCompleted && isRest
-              ? 'Rest day logged · tap for details'
-              : focus;
+          let focusLine = focus;
+          if (isCompleted && !isRest) focusLine = 'Workout completed · tap for summary';
+          else if (isCompleted && isRest) focusLine = 'Rest day logged · tap for details';
+          else if (isSubstitutePick) focusLine = focus + ' · Tap to substitute for today';
 
           let rightHtml = `<div class="day-date">${dateStr}</div>`;
           if (isCurrent && !isCompleted) rightHtml += `<div class="day-today-badge">Today</div>`;
@@ -4628,20 +5056,30 @@
               if (row.classList.contains('day-row--celebration-lock')) return;
               const flip = row.querySelector('.day-row-flip-inner');
               if (flip && flip.classList.contains('is-flipped')) return;
-              const sess = completedByDay[entry.programDay];
+              const sess = scheduleRowCompletedSession(entry, sessions);
               if (sess) openRestDayReview(entry.programDay, sess);
             });
-          } else if (!isRest && (isCurrent || isCompleted)) {
+          } else if (!isRest && isCompleted) {
             row.addEventListener('click', async () => {
               if (row.classList.contains('day-row--celebration-lock')) return;
               const flip = row.querySelector('.day-row-flip-inner');
               if (flip && flip.classList.contains('is-flipped')) return;
-              if (isCompleted) {
-                const sess = completedByDay[entry.programDay];
-                if (sess && sess.id) openSessionReview(sess.id);
-                return;
-              }
-              if (isCurrent) await startWorkout();
+              const sess = scheduleRowCompletedSession(entry, sessions);
+              if (sess && sess.id) openSessionReview(sess.id);
+            });
+          } else if (!isRest && isCurrent && !isCompleted) {
+            row.addEventListener('click', async () => {
+              if (row.classList.contains('day-row--celebration-lock')) return;
+              const flip = row.querySelector('.day-row-flip-inner');
+              if (flip && flip.classList.contains('is-flipped')) return;
+              await startWorkout();
+            });
+          } else if (isSubstitutePick) {
+            row.addEventListener('click', () => {
+              if (row.classList.contains('day-row--celebration-lock')) return;
+              const flip = row.querySelector('.day-row-flip-inner');
+              if (flip && flip.classList.contains('is-flipped')) return;
+              openSubstitutePreview(entry).catch(e => console.error(e));
             });
           }
 
@@ -4685,9 +5123,16 @@
       if (!newDate || !currentUser) return;
       await supabaseClient
         .from('user_program_state')
-        .update({ start_date: newDate, updated_at: new Date().toISOString() })
+        .update({
+          start_date: newDate,
+          schedule_tail_base_program_day: null,
+          schedule_tail_start_ymd: null,
+          updated_at: new Date().toISOString(),
+        })
         .eq('user_id', currentUser.id);
       programState.start_date = newDate;
+      programState.schedule_tail_base_program_day = null;
+      programState.schedule_tail_start_ymd = null;
       loadSettings();
     });
 
@@ -4702,7 +5147,14 @@
       const r2 = await supabaseClient.from('workout_sessions').delete().eq('user_id', currentUser.id);
       const r3 = await supabaseClient
         .from('user_program_state')
-        .update({ current_program_day: 1, updated_at: new Date().toISOString() })
+        .update({
+          current_program_day: 1,
+          workout_substitute_program_day: null,
+          workout_substitute_for_ymd: null,
+          schedule_tail_base_program_day: null,
+          schedule_tail_start_ymd: null,
+          updated_at: new Date().toISOString(),
+        })
         .eq('user_id', currentUser.id);
 
       if (r0.error || r1.error || r2.error || r3.error) {
@@ -4713,6 +5165,10 @@
 
       writeSyncQueueRaw([]);
       programState.current_program_day = 1;
+      programState.workout_substitute_program_day = null;
+      programState.workout_substitute_for_ymd = null;
+      programState.schedule_tail_base_program_day = null;
+      programState.schedule_tail_start_ymd = null;
       loadSettings();
       loadDashboard();
       showToast('Progress reset successfully.', 'success');
@@ -4776,11 +5232,16 @@
 
         // Update program state
         if (data.user_program_state) {
+          const st = data.user_program_state;
           await supabaseClient
             .from('user_program_state')
             .update({
-              current_program_day: data.user_program_state.current_program_day,
-              start_date: data.user_program_state.start_date,
+              current_program_day: st.current_program_day,
+              start_date: st.start_date,
+              workout_substitute_program_day: st.workout_substitute_program_day ?? null,
+              workout_substitute_for_ymd: st.workout_substitute_for_ymd ?? null,
+              schedule_tail_base_program_day: st.schedule_tail_base_program_day ?? null,
+              schedule_tail_start_ymd: st.schedule_tail_start_ymd ?? null,
               updated_at: new Date().toISOString(),
             })
             .eq('user_id', currentUser.id);
