@@ -4771,7 +4771,7 @@
 
         const { data: completingMeta } = await supabaseClient
           .from('workout_sessions')
-          .select('substitute_source_program_day')
+          .select('*')
           .eq('id', currentSessionId)
           .maybeSingle();
         const subSrc = completingMeta ? sessionSubstituteTemplateDay(completingMeta) : null;
@@ -4941,17 +4941,28 @@
     }
 
     async function openSessionReview(sessionId) {
-      const { data: session, error: se } = await supabaseClient
-        .from('workout_sessions')
-        .select('id, completed_at, workout_type, program_day, week, day, substitute_source_program_day')
-        .eq('id', sessionId)
-        .single();
-
       const listEl = document.getElementById('session-review-content');
-
-      if (se || !session) {
+      if (!sessionId) {
         showScreen('sessionReview', false);
         listEl.innerHTML = '<div class="session-review-heading">Could not load workout.</div>';
+        document.getElementById('session-review-title').textContent = 'Workout';
+        return;
+      }
+
+      const { data: session, error: se } = await supabaseClient
+        .from('workout_sessions')
+        .select('*')
+        .eq('id', sessionId)
+        .maybeSingle();
+
+      if (se || !session) {
+        console.error('openSessionReview', sessionId, se);
+        showScreen('sessionReview', false);
+        const hint =
+          se && se.message
+            ? `Could not load workout. (${se.message})`
+            : 'Could not load workout. Check connection or RLS policies for workout_sessions.';
+        listEl.innerHTML = '<div class="session-review-heading">' + hint + '</div>';
         document.getElementById('session-review-title').textContent = 'Workout';
         return;
       }
