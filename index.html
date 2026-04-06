@@ -1778,28 +1778,27 @@
     }
   }
 
+  /* Program days ahead: same card weight as other pending rows (no whole-row fade). */
   .day-row.future {
-    opacity: 0.55;
     cursor: default;
-    border-color: #ccc8be;
-    box-shadow:
-      0 3px 8px rgba(0,0,0,0.07),
-      0 1px 2px rgba(0,0,0,0.05),
-      inset 0 2px 0 rgba(255,255,255,0.65),
-      inset 0 -2px 0 rgba(0,0,0,0.05);
   }
 
-  @media (hover: hover) and (pointer: fine) {
-    .day-row.future:hover {
-      opacity: 0.68;
-      transform: translateY(-1px);
-      filter: brightness(1.04);
-      box-shadow:
-        0 6px 14px rgba(0,0,0,0.1),
-        0 2px 4px rgba(0,0,0,0.06),
-        inset 0 2px 0 rgba(255,255,255,0.75),
-        inset 0 -2px 0 rgba(0,0,0,0.05);
-    }
+  .day-row.future:not(.rest) .day-workout-name {
+    font-weight: 500;
+    color: #2c2c2c;
+  }
+
+  .day-row.future .day-workout-focus {
+    color: #888;
+  }
+
+  .day-row.future .day-date {
+    color: #574d42;
+  }
+
+  .day-row.future .day-number {
+    color: #706860;
+    border-color: #b8b2a6;
   }
 
   .day-row.rest:not(.completed) {
@@ -1903,10 +1902,6 @@
   .rest:not(.completed) .day-number {
     background: linear-gradient(180deg, #e8e4dc 0%, #ddd8ce 100%);
     border-color: #ccc8be;
-    color: #b0a89c;
-  }
-
-  .future .day-number {
     color: #b0a89c;
   }
 
